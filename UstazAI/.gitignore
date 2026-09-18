@@ -1,0 +1,14 @@
+bin/
+obj/
+*.user
+.vs/
+logs/
+*.log
+
+# Secrets — never committed. Use `dotnet user-secrets` locally or environment variables in
+# deployment (see README).
+.env
+appsettings.*.local.json
+
+# local secrets
+appsettings.Development.json

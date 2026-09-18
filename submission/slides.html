@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>UstazAI — презентация</title>
+<style>
+@page { size: 1280px 720px; margin: 0 }
+* { box-sizing: border-box; margin: 0; padding: 0 }
+body { font-family: "Segoe UI", Arial, sans-serif; color: #f4f1ec; background: #14110f }
+.s { width: 1280px; height: 720px; padding: 64px 76px; page-break-after: always; position: relative; overflow: hidden;
+  background: radial-gradient(900px 500px at 100% 0, #12433a 0, transparent 60%), #171310 }
+.s:last-child { page-break-after: auto }
+.tag { color: #2dd4bf; font-weight: 700; letter-spacing: .14em; font-size: 15px; text-transform: uppercase }
+h1 { font-size: 68px; line-height: 1.05; margin: 26px 0 22px; letter-spacing: -.02em }
+h2 { font-size: 44px; margin: 14px 0 30px; letter-spacing: -.01em }
+p, li { font-size: 24px; line-height: 1.45; color: #d9d3ca }
+.muted { color: #9a9288 }
+.grid { display: grid; gap: 22px }
+.g2 { grid-template-columns: 1fr 1fr } .g3 { grid-template-columns: repeat(3, 1fr) } .g4 { grid-template-columns: repeat(4, 1fr) }
+.card { background: #221d19; border: 1px solid #38312b; border-radius: 18px; padding: 24px 26px }
+.card b { display: block; font-size: 24px; color: #fff; margin-bottom: 8px }
+.card span { font-size: 20px; color: #bdb6ab; line-height: 1.4 }
+.n { color: #2dd4bf; font-weight: 800; font-size: 34px; display: block; margin-bottom: 6px }
+ul { list-style: none } li { padding-left: 30px; position: relative; margin-bottom: 14px }
+li::before { content: ""; position: absolute; left: 4px; top: 13px; width: 11px; height: 11px; border-radius: 50%; background: #2dd4bf }
+.flow { display: flex; gap: 10px; margin-top: 28px }
+.step { flex: 1; background: #221d19; border: 1px solid #38312b; border-radius: 16px; padding: 18px 12px; text-align: center }
+.step i { font-style: normal; display: block; color: #2dd4bf; font-weight: 800; font-size: 30px }
+.step b { font-size: 19px }
+.foot { position: absolute; left: 76px; bottom: 30px; right: 76px; display: flex; justify-content: space-between; color: #6f675d; font-size: 15px }
+.pill { display: inline-block; background: #0f3a33; color: #7ff0dd; border-radius: 999px; padding: 6px 16px; font-size: 18px; margin: 4px 6px 4px 0 }
+.big { font-size: 30px; color: #fff; font-weight: 700; line-height: 1.35 }
+</style></head><body>
+
+<!-- 1 -->
+<section class="s">
+  <div class="tag">LOCUS Startup Hackathon 2026 · Кейс 02</div>
+  <h1>UstazAI<br><span style="color:#2dd4bf">Маршрут поступления</span>, а не ещё один список вузов</h1>
+  <p style="max-width:860px">AI-сервис, который превращает профиль абитуриента Казахстана в понятный путь: куда поступать, почему именно туда и что сделать сегодня.</p>
+  <p class="muted" style="margin-top:34px">Код сабмита: LOCUSCASE2 · <b style="color:#fff">&lt;ССЫЛКА-НА-САЙТ&gt;</b></p>
+</section>
+
+<!-- 2 -->
+<section class="s">
+  <div class="tag">01 · Проблема</div>
+  <h2>Поступление — десятки решений, а информация разрознена</h2>
+  <div class="grid g3">
+    <div class="card"><span class="n">1</span><b>Слишком общие советы</b><span>Списки вузов и универсальные чаты не знают ваш балл ЕНТ, бюджет и сроки.</span></div>
+    <div class="card"><span class="n">2</span><b>Непонятно, что делать сейчас</b><span>Экзамены, документы, стипендии и дедлайны живут в разных местах.</span></div>
+    <div class="card"><span class="n">3</span><b>Ложная точность</b><span>Цифры без источников и обещания «гарантированного» поступления вводят в заблуждение.</span></div>
+  </div>
+  <p style="margin-top:34px">Наша аудитория: школьники 9–11 классов и выпускники колледжей Казахстана, поступающие на бакалавриат дома и за рубежом.</p>
+</section>
+
+<!-- 3 -->
+<section class="s">
+  <div class="tag">02 · Решение</div>
+  <h2>Один связный путь от анкеты до плана действий</h2>
+  <div class="flow">
+    <div class="step"><i>1</i><b>Вход</b></div>
+    <div class="step"><i>2</i><b>Профиль</b></div>
+    <div class="step"><i>3</i><b>Диагностика</b></div>
+    <div class="step"><i>4</i><b>Рекомендации</b></div>
+    <div class="step"><i>5</i><b>Сравнение</b></div>
+    <div class="step"><i>6</i><b>Roadmap</b></div>
+    <div class="step"><i>7</i><b>Следующий шаг</b></div>
+  </div>
+  <ul style="margin-top:40px">
+    <li>Путь ЕНТ, творческий экзамен, смена специальности, «не сдаю ЕНТ» (учёба за рубежом)</li>
+    <li>Каждая рекомендация объясняется по 4 факторам: академика, финансы, карьера, сроки</li>
+    <li>Изменили бюджет, страну или балл: результат и roadmap заметно меняются</li>
+  </ul>
+</section>
+
+<!-- 4 -->
+<section class="s">
+  <div class="tag">03 · Демонстрация</div>
+  <h2>Что видит пользователь</h2>
+  <div class="grid g2">
+    <div class="card"><b>Рекомендации с «почему подходит»</b><span>Ранжирование, шансы с диапазоном неопределённости, уровень доступности по деньгам, бейдж «Демо/Проверено».</span></div>
+    <div class="card"><b>Сравнение и карта вуза</b><span>Параметры рядом, интерактивная карта с меткой на вузе, стоимость жизни и безопасность.</span></div>
+    <div class="card"><b>Roadmap с дедлайнами</b><span>Даты считаются назад от реального срока программы. К каждой задаче кнопка «Учить»: пошаговый гайд и видео.</span></div>
+    <div class="card"><b>Один следующий шаг</b><span>Главный экран выделяет ближайшее действие и хранит прогресс.</span></div>
+  </div>
+  <p class="muted" style="margin-top:28px">Вставьте сюда 2–3 скриншота из работающего сайта (рекомендации, сравнение с картой, roadmap).</p>
+</section>
+
+<!-- 5 -->
+<section class="s">
+  <div class="tag">04 · Технология</div>
+  <h2>Модель считает, AI объясняет</h2>
+  <div class="grid g2">
+    <div class="card"><b>Frontend</b><span>Next.js 16, React 19, TypeScript, Tailwind, TanStack Query, next-intl (ru/kk/en), Leaflet</span></div>
+    <div class="card"><b>Backend</b><span>.NET 10, Clean Architecture, MediatR (CQRS), EF Core, SQL Server, JWT, Polly</span></div>
+    <div class="card"><b>Скоринг</b><span>Детерминированные движки оценки и допуска ЕНТ: чистый C#, 80 автотестов</span></div>
+    <div class="card"><b>AI (Gemini)</b><span>Структурированный вывод, Google Search для проверки данных, цепочка резервных моделей, guardrails</span></div>
+  </div>
+  <p style="margin-top:26px">Ответ AI очищается от гарантий поступления. Если AI недоступен, продукт работает на детерминированных текстах.</p>
+</section>
+
+<!-- 6 -->
+<section class="s">
+  <div class="tag">05 · Преимущества</div>
+  <h2>Почему это не чат и не каталог</h2>
+  <div class="grid g3">
+    <div class="card"><b>Честные данные</b><span>Каждое число: «Демо» или «Проверено» с источниками. Кнопка «Проверить через интернет».</span></div>
+    <div class="card"><b>Система Казахстана</b><span>Пороги ЕНТ, гранты, три уровня допуска, альтернативные треки.</span></div>
+    <div class="card"><b>Деньги без иллюзий</b><span>Доступно / впритык / вне бюджета. Режим «только грант» считает покрытие.</span></div>
+    <div class="card"><b>Три языка</b><span>Интерфейс и тексты AI на русском, казахском, английском.</span></div>
+    <div class="card"><b>Прозрачность AI</b><span>Журнал решений, метрики задержки и доли резервных ответов.</span></div>
+    <div class="card"><b>Доп. функции</b><span>Стипендии, календарь, эссе-ревью, избранное, «что если».</span></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="s">
+  <div class="tag">06 · Команда</div>
+  <h2>Команда</h2>
+  <div class="grid g3">
+    <div class="card"><b>&lt;Имя&gt;</b><span>&lt;роль: продукт, UX/UI&gt;</span></div>
+    <div class="card"><b>&lt;Имя&gt;</b><span>&lt;роль: frontend&gt;</span></div>
+    <div class="card"><b>&lt;Имя&gt;</b><span>&lt;роль: backend, AI&gt;</span></div>
+  </div>
+  <p class="muted" style="margin-top:30px">Замените заполнители на участников команды и их вклад.</p>
+</section>
+
+<!-- 8 -->
+<section class="s">
+  <div class="tag">07 · Развитие</div>
+  <h2>Что дальше</h2>
+  <ul>
+    <li>Реальный каталог вузов вместо демо: официальные источники и порталы ЕНТ</li>
+    <li>Уведомления о дедлайнах и напоминания о шагах roadmap</li>
+    <li>Магистратура и новые страны, расширение стипендий</li>
+    <li>Мобильное приложение и работа офлайн</li>
+  </ul>
+  <p class="big" style="margin-top:40px">UstazAI: сначала понять человека, потом показать маршрут.</p>
+  <p class="muted" style="margin-top:14px">&lt;ССЫЛКА-НА-САЙТ&gt; · github.com/&lt;репозиторий&gt;</p>
+</section>
+</body></html>

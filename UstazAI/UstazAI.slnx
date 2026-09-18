@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="UstazAI/UstazAI.csproj" />
+  <Project Path="UstazAI.Domain/UstazAI.Domain.csproj" />
+  <Project Path="UstazAI.Application/UstazAI.Application.csproj" />
+  <Project Path="UstazAI.Infrastructure/UstazAI.Infrastructure.csproj" />
+  <Project Path="UstazAI.Tests/UstazAI.Tests.csproj" />
+</Solution>

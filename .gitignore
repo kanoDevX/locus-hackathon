@@ -1,0 +1,13 @@
+# secrets and local config
+appsettings.Development.json
+.env
+.env.local
+*.user
+# build output
+bin/
+obj/
+node_modules/
+.next/
+logs/
+.vs/
+tsconfig.tsbuildinfo
