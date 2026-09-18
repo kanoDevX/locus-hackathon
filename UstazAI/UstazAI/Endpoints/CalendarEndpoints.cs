@@ -18,8 +18,6 @@ public static class CalendarEndpoints
         group.MapGet("/notifications", async (Guid profileId, int? withinDays, ICurrentUser user, ISender sender, CancellationToken ct) =>
             Results.Ok(await sender.Send(new GetNotificationsQuery(profileId, user.UserId!.Value, withinDays ?? 14), ct)));
 
-        // A tangible, downloadable artifact a student can import into any calendar app —
-        // the concrete "reminders" deliverable behind the deadline-tracking feature.
         group.MapGet("/calendar.ics", async (Guid profileId, ICurrentUser user, ISender sender, CancellationToken ct) =>
         {
             var entries = await sender.Send(new GetCalendarQuery(profileId, user.UserId!.Value), ct);

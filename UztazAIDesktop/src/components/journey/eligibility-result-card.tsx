@@ -10,14 +10,11 @@ import { useCalculateEligibility } from "@/lib/api/examIntake";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import type { EligibilityResultDto } from "@/lib/api/types";
 
-/** One program's eligibility verdict, §12 — dual grant/paid columns side by side, reusing
- * UncertaintyBand for GrantCompetitiveness rather than a bare percentage. */
 export function EligibilityResultCard({ result }: { result: EligibilityResultDto }) {
   const t = useTranslations("eligibility");
   const profileId = useAuthStore((s) => s.activeProfileId);
   const calculate = useCalculateEligibility(profileId);
 
-  // Exam thresholds are what this verdict is computed from; document-only paths have none.
   const verify = result.isDocumentOnlyVerdict
     ? undefined
     : async () => {

@@ -1,5 +1,3 @@
-/** Shared Framer Motion tokens — one easing/duration set applied everywhere so motion always
- * communicates the same "weight" of state change across the app (§2 motion system). */
 
 export const EASE_STANDARD = [0.4, 0, 0.2, 1] as const;
 export const EASE_EMPHASIZED = [0.2, 0, 0, 1] as const;
@@ -42,8 +40,6 @@ export const celebratoryPop = {
   },
 };
 
-/** Applied to a card that was just added/removed/re-ranked by the Diff Engine — a brief
- * colored-outline pulse before settling, never a silent re-render. */
 export const diffHighlight = {
   initial: { boxShadow: "0 0 0 0px var(--brand-400)" },
   animate: {

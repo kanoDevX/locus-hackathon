@@ -7,13 +7,6 @@ import {
   admissionExamTracks,
 } from "./exam-intake-schema";
 
-/**
- * The wizard's own top-level schema (§12 Addendum 2) — a superset of the existing profile
- * schema (still needed: HybridScoringEngine/Diagnostics operate on the base StudentProfile
- * fields) plus the exam-intake fields, so one wizard collects everything a first-time student
- * needs instead of two disconnected forms. Reuses `profileSchema`'s field defs and
- * `validateExamIntakeCrossFields` directly rather than re-declaring either rule set.
- */
 export const intakeWizardSchema = z
   .object({
     ...profileSchema.shape,

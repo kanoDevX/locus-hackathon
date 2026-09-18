@@ -188,10 +188,6 @@ const AFFORDABILITY_VARIANT: Record<AffordabilityTier, "success" | "warning" | "
   OverBudget: "danger",
 };
 
-/** Affordability & Fairness Audit (§10.6) — a program can score well academically and still be
- * honestly out of reach financially; this discloses that plainly rather than burying it in a
- * bare 0-100 "financial fit" number. Tier and cost come straight from
- * HybridScoringEngine.EvaluateAffordability, never AI-estimated. */
 function AffordabilityBadge({ tier, effectiveCostUsd, grantOnly }: { tier: AffordabilityTier; effectiveCostUsd: number; grantOnly: boolean }) {
   const t = useTranslations("recommendations");
   return (

@@ -68,18 +68,6 @@ const DEFAULT_VALUES: IntakeWizardFormValues = {
   fundingTrackPreference: "Flexible",
 };
 
-/**
- * `track` has no field of its own on `ProfileDto` — it only ever gets set by the wizard's own
- * interactive handlers (`onSelectStage`, `onSelectSpecialtyContinuity`, ...), never by loading an
- * existing profile. A retaking college-stage student whose `educationStage`/`collegeBackground`
- * already came back from the server therefore started with `track` stuck at
- * `DEFAULT_VALUES.track` ("StandardEnt") — a school track invalid for a college stage — unless
- * they happened to re-click every derivation step in order. That produced a cross-field
- * validation error on `track` when advancing past the path step, and because `track` is chosen
- * via `ChoiceCard` (which never renders a field error, unlike `Field`-wrapped inputs), "Next"
- * would just silently do nothing. Deriving `track` the same way the interactive handlers would
- * have, right when the profile loads, keeps the form internally consistent from the start.
- */
 function deriveTrackFromProfile(profile: ProfileDto): IntakeWizardFormValues["track"] {
   const stage = profile.educationStage ?? "SchoolGrade11";
   if (!isCollegeStageOf(stage)) return "StandardEnt";
@@ -87,23 +75,9 @@ function deriveTrackFromProfile(profile: ProfileDto): IntakeWizardFormValues["tr
   return profile.fundingTrackPreference === "PaidOnly" ? "ContinuingSpecialtyPaid" : "ContinuingSpecialtyGrant";
 }
 
-/**
- * Placement & Eligibility Intake Wizard (§12 Addendum 2) — the product's literal front door.
- * Replaces the old flat Profile step: collects the same base profile fields (still needed by
- * HybridScoringEngine/Diagnostics downstream) PLUS the branching exam-intake fields, in one
- * wizard, then submits both `POST /profile` and `POST /exam-intake` before handing off to the
- * staged eligibility-calculation screen. The step indicator itself lives in the focused
- * `OnboardingHeader` (journey/layout.tsx), driven by `journeyStore.wizardProgress` set below —
- * this component owns only the form.
- */
 export function IntakeWizardForm() {
   const t = useTranslations("intake");
   const tCommon = useTranslations("common");
-  // Zod messages in exam-intake-schema.ts are stable keys (e.g. "totalScoreRequired"), not raw
-  // English prose — translate here before ever handing one to a <Field error=...>. A user
-  // reported seeing "A total score is required for this track." verbatim in a Russian UI before
-  // this existed; keeping the keys and this one translation point makes that class of bug
-  // impossible to reintroduce by accident.
   function fieldError(message: string | undefined): string | undefined {
     return message ? t(`errors.${message}` as Parameters<typeof t>[0]) : undefined;
   }
@@ -162,15 +136,6 @@ export function IntakeWizardForm() {
     return () => sub.unsubscribe();
   }, [form]);
 
-  // `goNext` validates by calling `form.trigger()` directly, never `form.handleSubmit()` — this
-  // is a multi-step wizard, not a single submit. React Hook Form's default reValidateMode
-  // ("onChange", meant to clear a field's error as soon as it's fixed) is gated on
-  // `formState.isSubmitted`, which only `handleSubmit` ever sets — so it never fires here, and an
-  // error `trigger()` surfaced stays on screen verbatim even after the user corrects the value. A
-  // user reported exactly this: entered a valid total score, the "score is required" message
-  // never went away until they clicked Next again. Once a step has been validated at least once
-  // (formState.errors is non-empty), re-run that step's validation on every further edit to its
-  // own fields so a fixed field's error clears immediately instead of looking stuck.
   useEffect(() => {
     const sub = form.watch((_values, { name }) => {
       if (!name || Object.keys(form.formState.errors).length === 0) return;
@@ -183,8 +148,6 @@ export function IntakeWizardForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  // Drives the top-of-viewport "Step X of Y" indicator in OnboardingHeader — cleared on unmount
-  // so it never lingers once the wizard is no longer mounted (e.g. after a successful submit).
   useEffect(() => {
     setWizardProgress({ step, totalSteps: WIZARD_TOTAL_STEPS });
     return () => setWizardProgress(null);
@@ -196,10 +159,6 @@ export function IntakeWizardForm() {
   const subjectBreakdown = form.watch("subjectBreakdown");
   const supplementaryExams = form.watch("supplementaryExams");
   const isCollege = isCollegeStageOf(educationStage);
-  // Both tracks have no Kazakhstan exam score to collect — ContinuingSpecialtyPaid (direct
-  // admission by documents) and NotTakingEnt (applying abroad only, so the ENT/grant system is
-  // inapplicable by definition, not merely unmet). They still get their own distinct explainer
-  // text on the scores step since the reason is different for each.
   const isScoreless = track === "ContinuingSpecialtyPaid" || track === "NotTakingEnt";
   const isNotTakingEnt = track === "NotTakingEnt";
   const continuingChoiceMade = collegeBackground ? collegeBackground.targetSpecialtyMatchesCollegeSpecialty : null;
@@ -212,13 +171,6 @@ export function IntakeWizardForm() {
   } as const;
 
   function selectNotTakingEnt() {
-    // Deliberately does NOT touch collegeBackground. An earlier version nulled it out here (it's
-    // KZ-college-specific data that no longer applies once you're opting out of that system) —
-    // but for a college-stage student that also hid the *entire* specialty-continuity section
-    // (gated on `collegeBackground` being non-null), including the "same"/"different specialty"
-    // cards needed to switch back — a real bug: a user picked this and then had no way to undo
-    // it. Leaving collegeBackground as-is keeps every option visible and clickable at once;
-    // `isNotTakingEnt` alone (not collegeBackground's presence) now drives what's required.
     form.setValue("track", "NotTakingEnt");
     form.setValue("fundingTrackPreference", "Flexible");
   }
@@ -244,13 +196,7 @@ export function IntakeWizardForm() {
     }
   }
 
-  // Two plain-language questions replace what used to be a track dropdown kept manually in sync
-  // with a separate "matches" switch — the two controls could silently disagree with each other.
-  // Now the track is always *derived* from the answers, never picked independently of them.
   function onSelectSpecialtyContinuity(matches: boolean) {
-    // A student can reach here after having picked "Not taking the ENT" first, which clears
-    // collegeBackground entirely (selectNotTakingEnt above) — re-initialize it rather than
-    // setting a nested path on null, same lazy-init onSelectStage already does.
     if (!form.getValues("collegeBackground")) {
       form.setValue("collegeBackground", { ...DEFAULT_COLLEGE_BACKGROUND, targetSpecialtyMatchesCollegeSpecialty: matches });
     } else {
@@ -273,10 +219,6 @@ export function IntakeWizardForm() {
   async function goNext() {
     const valid = await form.trigger(WIZARD_STEP_FIELDS[step]);
     if (!valid) {
-      // Step 0 (education stage) and step 2 (track / funding / college background) are all
-      // chosen via ChoiceCard, which — unlike a Field-wrapped input — never renders its own error
-      // message. Without this, a validation failure there left "Next" looking like it silently
-      // did nothing (see deriveTrackFromProfile's doc comment for the bug this most often masked).
       if (step === 0 || step === 2) toast.error(t("stepValidationError"));
       return;
     }
@@ -510,13 +452,6 @@ export function IntakeWizardForm() {
                             selected={!isNotTakingEnt && continuingChoiceMade === false}
                             onClick={() => onSelectSpecialtyContinuity(false)}
                           />
-                          {/* A student can also opt entirely out of Kazakhstan's college-continuation
-                              system — living right alongside "same"/"different" rather than behind a
-                              separate toggle keeps every option one click away from every other one.
-                              Nulling collegeBackground here to hide this whole section (the earlier
-                              approach) trapped a student who picked it: with the section gone, there
-                              was no way back to "same"/"different" either — a real bug reported by a
-                              user who clicked it and then "couldn't undo". */}
                           <ChoiceCard
                             icon={PlaneTakeoff}
                             title={t("trackLabel.NotTakingEnt")}
@@ -595,13 +530,6 @@ export function IntakeWizardForm() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
-                  {/* An applicant — school or college stage — can reach this step already on a
-                      scored track (StandardEnt/ChangingSpecialty/etc. are the defaults, and the
-                      "Not taking the ENT" choice on the previous step is easy to miss) and then
-                      get stuck on a required-score field with no visible way out — a real report
-                      from a user who asked "isn't this about the ENT? then why is there no button
-                      here [to say I'm not taking it]" — and who hit it again on the *college*
-                      path specifically, which this button didn't originally cover. */}
                   {!isScoreless && (
                     <button
                       type="button"

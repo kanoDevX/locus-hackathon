@@ -4,9 +4,6 @@ using UstazAI.Application.PrepPlan;
 
 namespace UstazAI.Endpoints;
 
-/// <summary>Gap-to-course roadmap (§13.2): deterministic SubjectPrep tasks generated from
-/// GapAnalysisEngine, plugged into the existing RoadmapTask DAG rather than a separate task
-/// type. No Gemini call, so no AI rate limit needed — runs like CalculateEligibilityCommand.</summary>
 public static class PrepPlanEndpoints
 {
     public static void MapPrepPlanEndpoints(this IEndpointRouteBuilder app)

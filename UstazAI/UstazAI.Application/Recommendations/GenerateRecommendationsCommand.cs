@@ -8,11 +8,6 @@ namespace UstazAI.Application.Recommendations;
 
 public sealed record GenerateRecommendationsCommand(Guid ProfileId, Guid UserId) : IRequest<GenerateRecommendationsResult>;
 
-/// <summary>A record can still implement ISanitizableAiResponse: SanitizeAiText doesn't need to
-/// reassign this type's own (init-only) properties, only call each already-mutable
-/// RecommendationDto's own SanitizeAiText — this wrapper's response type is
-/// GenerateRecommendationsResult itself (not a bare List), so GuardrailBehavior's generic
-/// IEnumerable recursion doesn't reach into Recommendations on its own; this makes it explicit.</summary>
 public sealed record GenerateRecommendationsResult(
     List<RecommendationDto> Recommendations, RecommendationDeltaDto Delta, AffordabilitySummaryDto Affordability) : ISanitizableAiResponse
 {
@@ -22,12 +17,6 @@ public sealed record GenerateRecommendationsResult(
     }
 }
 
-/// <summary>
-/// Always recomputes against the current profile version. Comparing this batch's program ids to
-/// the most recent PRIOR batch is exactly how the "changing one survey answer visibly and
-/// traceably changes recommendations" hard requirement is demonstrated: call this endpoint,
-/// change the profile, call it again, and Delta shows precisely what moved.
-/// </summary>
 public sealed class GenerateRecommendationsHandler(IAppDbContext db, RecommendationEngine engine)
     : IRequestHandler<GenerateRecommendationsCommand, GenerateRecommendationsResult>
 {

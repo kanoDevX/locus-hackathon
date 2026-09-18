@@ -50,14 +50,6 @@ public sealed class CreateOrUpdateProfileHandler(IAppDbContext db)
 {
     public async Task<CreateOrUpdateProfileResult> Handle(CreateOrUpdateProfileCommand cmd, CancellationToken ct)
     {
-        // A caller-supplied ProfileId that doesn't resolve to one of THIS user's profiles (a stale
-        // client-side id from before a demo reset, a typo, or a foreign id) must fail loudly, not
-        // silently fall through to "create a new one" — that would leave the user with two
-        // StudentProfile rows for one account (the model assumes exactly one, see
-        // GetMyProfileQuery), with exam records/roadmap/favorites entered under the first one now
-        // invisible whichever row a later request happens to resolve to. Every other handler in
-        // this codebase throws KeyNotFoundException for an unowned/missing id; this one now does
-        // too, distinguishing that from the genuine "first-time create" case (ProfileId omitted).
         if (cmd.ProfileId is { } suppliedId)
         {
             var owned = await db.StudentProfiles.FirstOrDefaultAsync(p => p.Id == suppliedId && p.UserId == cmd.UserId, ct)

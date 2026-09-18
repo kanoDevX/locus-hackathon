@@ -3,12 +3,6 @@ using UstazAI.Domain.Entities;
 
 namespace UstazAI.Application.Common.Interfaces;
 
-/// <summary>
-/// Application-layer view of the persistence store. Kept deliberately thin (EF Core's DbSet
-/// directly, no extra repository ceremony) — this is a hackathon-pragmatic CQRS choice, not an
-/// oversight: Infrastructure's DbContext implements this so Application never references
-/// Microsoft.EntityFrameworkCore.SqlServer or connection strings.
-/// </summary>
 public interface IAppDbContext
 {
     DbSet<User> Users { get; }

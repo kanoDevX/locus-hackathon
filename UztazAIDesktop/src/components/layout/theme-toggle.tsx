@@ -9,8 +9,6 @@ const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  // Client-only flag without an effect+setState (which triggers a cascading re-render) — the
-  // idiomatic way to bridge server/client mismatch for something like a theme icon.
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   return (

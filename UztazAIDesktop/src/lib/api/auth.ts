@@ -41,9 +41,6 @@ export function useUpdateAccount() {
   });
 }
 
-/** Succeeds with the session already revoked server-side (ChangePasswordCommand logs out every
- * device, this one included) — the caller is responsible for clearing local session state and
- * sending the user back to sign in with the new password. */
 export function useChangePassword() {
   return useMutation({
     mutationFn: (input: { currentPassword: string; newPassword: string }) =>

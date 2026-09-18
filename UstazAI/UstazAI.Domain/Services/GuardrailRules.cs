@@ -2,11 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>
-/// Rule set enforced on every AI-generated string before it reaches the client. Operationalizes
-/// the case's "no fabricated certainty / no guaranteed admission" rule as code, not just a
-/// prompt instruction (§5.3).
-/// </summary>
 public static partial class GuardrailRules
 {
     private static readonly Regex[] ForbiddenPatterns =
@@ -19,9 +14,6 @@ public static partial class GuardrailRules
     public static bool ContainsForbiddenLanguage(string text) =>
         ForbiddenPatterns.Any(p => p.IsMatch(text));
 
-    /// <summary>Rewrites a violating sentence into a hedged, non-guaranteeing equivalent.
-    /// Used as a last-resort safety net; the Gemini system instructions are already told never
-    /// to produce this language in the first place.</summary>
     public static string Sanitize(string text)
     {
         if (!ContainsForbiddenLanguage(text)) return text;

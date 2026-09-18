@@ -11,9 +11,6 @@ namespace UstazAI.Application.Comparison;
 
 public sealed record CompareProgramsQuery(Guid ProfileId, Guid UserId, List<int> ProgramIds) : IRequest<List<ProgramComparisonRowDto>>;
 
-/// <summary>CampusMap is folded directly into the existing comparison row (§14) rather than a
-/// disconnected map screen — a judge comparing programs sees environment/location data right
-/// alongside fit scores, matching the spec's explicit "integrate into Comparison" instruction.</summary>
 public sealed record ProgramComparisonRowDto(
     ProgramSummaryDto Program, double OverallScore, double AcademicFitScore, double FinancialFitScore,
     double CareerFitScore, double TimelineFitScore, UncertaintyEstimateDto AdmissionProbability,
@@ -28,7 +25,6 @@ public sealed class CompareProgramsValidator : AbstractValidator<ComparePrograms
     }
 }
 
-/// <summary>Pure, deterministic side-by-side diff — no AI call needed (§4 stage 5).</summary>
 public sealed class CompareProgramsHandler(IAppDbContext db, IMapProvider mapProvider)
     : IRequestHandler<CompareProgramsQuery, List<ProgramComparisonRowDto>>
 {

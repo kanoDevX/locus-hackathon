@@ -2,12 +2,6 @@ using UstazAI.Domain.Enums;
 
 namespace UstazAI.Infrastructure.Ai;
 
-/// <summary>
-/// Versioned, source-controlled system instructions — one per module (§6). Kept as plain
-/// constants/methods rather than scattered magic strings so prompt changes are code-reviewable.
-/// Every instruction explicitly forbids guarantee/certainty language as a first line of defense,
-/// backed by the code-level GuardrailRules safety net in the Domain layer.
-/// </summary>
 public static class PromptLibrary
 {
     private const string SafetyClause =

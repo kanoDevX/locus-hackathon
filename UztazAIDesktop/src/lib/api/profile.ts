@@ -28,14 +28,6 @@ export function useProfile(profileId: string | null | undefined) {
   });
 }
 
-/** Resolves the signed-in user's own profile without needing `activeProfileId` cached
- * client-side first — `activeProfileId` lives only in localStorage (see auth-store.ts), so a
- * fresh login on a different device/browser, or a cleared cache, leaves it empty even for a
- * returning user who already completed intake. Without this, the app would send them straight
- * back into the wizard, which would then create a *second* profile server-side (the same bug a
- * missing "get my own record" lookup causes in any per-user-resource API). Backend returns 200
- * with an empty body (→ undefined, coerced to null here) rather than 404 when there's genuinely
- * no profile yet — that's an expected first-time state, not an error. */
 export function useMyProfile(enabled: boolean) {
   return useQuery({
     queryKey: ["profile", "mine"],

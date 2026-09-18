@@ -12,14 +12,6 @@ namespace UstazAI.Application.ExamIntake;
 
 public sealed record CalculateEligibilityCommand(Guid ProfileId, Guid UserId) : IRequest<List<EligibilityResultDto>>;
 
-/// <summary>
-/// Runs GrantEligibilityEngine against every seeded domestic (Kazakhstan) program for the
-/// applicant's latest exam record. Purely deterministic — no Gemini call, no fallback path needed
-/// — so it runs synchronously like the rest of the hybrid-scoring pipeline rather than as a
-/// background job; see the README for why an async-job-with-live-progress version (as the
-/// original spec sketched) was not built this round, consistent with the product's existing
-/// documented "no SignalR" scope decision.
-/// </summary>
 public sealed class CalculateEligibilityHandler(IAppDbContext db, DecisionLedgerWriter ledger)
     : IRequestHandler<CalculateEligibilityCommand, List<EligibilityResultDto>>
 {
@@ -34,12 +26,6 @@ public sealed class CalculateEligibilityHandler(IAppDbContext db, DecisionLedger
             .FirstOrDefaultAsync(ct)
             ?? throw new InvalidOperationException("No exam record on file — submit the exam intake first (POST /exam-intake).");
 
-        // Kazakhstan's ENT/grant-eligibility system doesn't apply to foreign programs — and for a
-        // student who indicated they aren't sitting the ENT at all (applying abroad only), it
-        // doesn't apply to *any* program, domestic included: evaluating them against a state/
-        // university threshold they were never trying to clear would misrepresent a track that's
-        // inapplicable by definition as one they simply failed. Their actual program matches
-        // still come from Recommendations, which never depended on an ExamRecord at all.
         var domesticPrograms = examRecord.Track == AdmissionExamTrack.NotTakingEnt
             ? []
             : await db.ProgramOfferings
@@ -48,11 +34,6 @@ public sealed class CalculateEligibilityHandler(IAppDbContext db, DecisionLedger
                 .Where(p => p.University.Country == "Kazakhstan")
                 .ToListAsync(ct);
 
-        // A repeat call at the same profile version (re-running the check, a retried request —
-        // nothing here bumps Version) must replace that version's verdict batch, not append a
-        // second one: GetEligibilityResultQuery and the chat handler's "top eligibility" lookup
-        // both filter strictly on ProfileVersion == profile.Version with no de-duplication, so
-        // leftover rows from an earlier call would double up every program's verdict.
         var staleAtThisVersion = await db.EligibilityResults
             .Where(r => r.StudentProfileId == profile.Id && r.ProfileVersion == profile.Version)
             .ToListAsync(ct);

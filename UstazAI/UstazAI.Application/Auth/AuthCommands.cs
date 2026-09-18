@@ -119,9 +119,6 @@ public sealed class RefreshTokenHandler(IAppDbContext db, IJwtTokenService jwt)
     }
 }
 
-/// <summary>Revokes one refresh token (single-device logout). Access tokens are short-lived by
-/// design (see JwtOptions.AccessTokenMinutes) and are not separately blacklisted — revoking the
-/// refresh token stops the session from renewing once the access token expires.</summary>
 public sealed record LogoutCommand(string RefreshToken) : IRequest;
 
 public sealed class LogoutHandler(IAppDbContext db, IJwtTokenService jwt) : IRequestHandler<LogoutCommand>
@@ -138,8 +135,6 @@ public sealed class LogoutHandler(IAppDbContext db, IJwtTokenService jwt) : IReq
     }
 }
 
-/// <summary>Revokes every active refresh token for the calling user — "log out everywhere",
-/// useful after a suspected compromise or a shared demo device.</summary>
 public sealed record LogoutAllCommand(Guid UserId) : IRequest;
 
 public sealed class LogoutAllHandler(IAppDbContext db) : IRequestHandler<LogoutAllCommand>

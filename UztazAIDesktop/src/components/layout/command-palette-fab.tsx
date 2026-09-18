@@ -4,13 +4,6 @@ import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
-/**
- * Floating quick-access trigger (§ UX request: move the "type to find" menu to the bottom-right,
- * out of the header, the way most apps place a persistent search/help affordance). Fixed
- * position so it's reachable from anywhere without competing for header space; the ⌘K keyboard
- * shortcut (handled inside CommandPalette itself) still works regardless of whether this is
- * visible or scrolled past.
- */
 export function CommandPaletteFab({ onClick }: { onClick: () => void }) {
   const t = useTranslations("commandPalette");
 

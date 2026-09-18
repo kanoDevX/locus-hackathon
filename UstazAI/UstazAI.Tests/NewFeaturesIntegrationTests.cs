@@ -11,9 +11,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers the features added after the initial submission: favorites, deadline
-/// calendar/notifications, scholarship search, program catalog search, essay review (fallback
-/// path), and refresh-token logout.</summary>
 public sealed class NewFeaturesIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, string RefreshToken, Guid ProfileId)> SetupAsync()

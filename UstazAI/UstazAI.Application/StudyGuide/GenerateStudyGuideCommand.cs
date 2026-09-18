@@ -12,14 +12,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Application.StudyGuide;
 
-/// <summary>
-/// Full-screen "how do I actually learn this" study plan (§ UX request) for one SubjectPrep
-/// roadmap task, persisted so revisiting it never regenerates by accident (also kinder to the
-/// Gemini budget). One guide per RoadmapTask — <see cref="ForceRegenerate"/> replaces it in
-/// place rather than creating a second row, since there is only ever one "current" guide.
-/// Grounded in the applicant's own latest exam record where the subject is present, but never
-/// blocks on that: a subject with no score on file still gets a generic, honestly-labeled plan.
-/// </summary>
 public sealed record GenerateStudyGuideCommand(Guid ProfileId, Guid UserId, int RoadmapTaskId, bool ForceRegenerate = false)
     : IRequest<StudyGuideDto>;
 
@@ -34,17 +26,12 @@ public sealed class GenerateStudyGuideHandler(IAppDbContext db, IAiReasoningServ
         var task = await db.RoadmapTasks.FirstOrDefaultAsync(t => t.Id == cmd.RoadmapTaskId && t.StudentProfileId == profile.Id, ct)
             ?? throw new KeyNotFoundException($"Roadmap task {cmd.RoadmapTaskId} not found");
 
-        // Every roadmap task can have a guide, not just SubjectPrep ones: documents, scholarship,
-        // IELTS, essay/interview and the final application all need "how do I actually do this".
         var topic = string.IsNullOrWhiteSpace(task.Subject) ? task.Title : task.Subject;
 
         var existing = await db.StudyGuides.FirstOrDefaultAsync(g => g.RoadmapTaskId == cmd.RoadmapTaskId, ct);
         if (existing is not null && !cmd.ForceRegenerate)
             return existing.ToDto();
 
-        // Best-effort grounding from the student's own latest exam record — an honest null when
-        // the subject isn't in the breakdown (e.g. a task from a different track), never a
-        // fabricated score standing in for one that doesn't exist.
         var examRecord = await db.ExamRecords
             .Where(r => r.StudentProfileId == profile.Id)
             .OrderByDescending(r => r.CreatedAtUtc)
@@ -112,9 +99,6 @@ public sealed class GenerateStudyGuideHandler(IAppDbContext db, IAiReasoningServ
         return guide.ToDto();
     }
 
-    /// <summary>Generic-but-genuinely-useful structure, never a fabricated specific fact — used
-    /// only when Gemini is unavailable, same "graceful degradation" contract as every other
-    /// AI-backed feature in the product.</summary>
     private static StudyGuideAiOutput BuildFallback(string subject, RoadmapTaskCategory category) => category switch
     {
         RoadmapTaskCategory.Document => Steps(

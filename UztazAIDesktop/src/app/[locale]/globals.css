@@ -1,19 +1,9 @@
 @import "tailwindcss";
 
-/* Tailwind's `dark:` variant defaults to the OS `prefers-color-scheme` media query. This app's
-   theme is controlled by next-themes via a `data-theme` attribute on <html> instead (so a
-   manual toggle overrides the OS setting) — this re-points every `dark:` utility at that
-   attribute so the two systems agree. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* ============================================================
-   UstazAI design tokens — single source of truth for color,
-   type, spacing rhythm, motion and elevation across every screen.
-   ============================================================ */
-
 :root {
-  /* Brand: "Wayfinder Teal" — calm, confident, distinct from the
-     generic SaaS blue/violet and from pastel-cartoon EdTech. */
+
   --brand-50: #eefaf7;
   --brand-100: #d3f1e9;
   --brand-200: #a6e3d3;
@@ -25,7 +15,6 @@
   --brand-800: #124a41;
   --brand-900: #103e37;
 
-  /* Warm neutrals (stone-leaning, not clinical gray) */
   --neutral-0: #ffffff;
   --neutral-50: #faf9f7;
   --neutral-100: #f2f0ec;
@@ -39,7 +28,6 @@
   --neutral-900: #201d18;
   --neutral-950: #14120e;
 
-  /* Semantic */
   --success-500: #2f9e5b;
   --success-100: #dff3e6;
   --warning-500: #d98a1c;
@@ -59,14 +47,12 @@
   --primary-foreground: #ffffff;
   --ring: var(--brand-400);
 
-  /* Motion tokens */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --duration-micro: 150ms;
   --duration-transition: 320ms;
   --duration-celebratory: 520ms;
 
-  /* Elevation (max 3 levels: base / raised / overlay) */
   --shadow-raised: 0 1px 2px rgba(20, 18, 14, 0.06), 0 1px 1px rgba(20, 18, 14, 0.04);
   --shadow-overlay: 0 12px 32px rgba(20, 18, 14, 0.16), 0 4px 10px rgba(20, 18, 14, 0.08);
 

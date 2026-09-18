@@ -30,9 +30,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddMemoryCache();
 
-// Enums serialize as readable strings ("Medium", not 2) over the wire — consistent with how
-// they're already stored as strings in the database (see UstazDbContext), and far more legible
-// for a frontend client and for judges reading the Scalar/OpenAPI docs directly.
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -47,10 +44,6 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
-// Bound from the same IOptions<JwtOptions> that JwtTokenService uses to *issue* tokens (both
-// resolved lazily through DI), so the signing key used to validate a token always matches the
-// one used to sign it — reading a manual snapshot here instead can desync from what the token
-// service later resolves (e.g. under WebApplicationFactory config overrides in tests).
 builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
     .Configure<Microsoft.Extensions.Options.IOptions<JwtOptions>>((bearerOptions, jwtOptionsAccessor) =>
     {
@@ -70,8 +63,6 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 
-// Token-bucket rate limiting on AI-backed endpoints, keyed per authenticated user (falls back
-// to remote IP), so one caller can't burn through the Gemini budget mid-demo (§3).
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -86,15 +77,6 @@ builder.Services.AddRateLimiter(options =>
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
         }));
 
-    // Brute-force / credential-stuffing mitigation on login, register and refresh (OWASP ASVS
-    // baseline for authentication endpoints) — keyed by IP since the caller isn't authenticated
-    // yet at this point. Fixed window rather than a token bucket: a burst of guesses should be
-    // blocked outright for the rest of the window, not smoothly drip-fed through. The limit is
-    // read from IConfiguration via the request's own service provider (not a snapshot of
-    // builder.Configuration captured at startup) so it reflects whatever configuration source
-    // ends up winning once the host is fully built — a manual startup-time snapshot can desync
-    // from that under WebApplicationFactory config overrides in tests (see UstazApiFactory),
-    // the same class of bug already hit once with the JWT signing key.
     options.AddPolicy("auth", httpContext =>
     {
         var config = httpContext.RequestServices.GetRequiredService<IConfiguration>();
@@ -134,8 +116,6 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Standard infra-conventional health endpoint (for load balancers / uptime tooling), in
-// addition to the richer /api/v1/system/health used by the product's own judge test script.
 app.MapHealthChecks("/health").AllowAnonymous();
 
 app.MapAuthEndpoints();
@@ -162,4 +142,4 @@ app.MapSystemEndpoints();
 
 app.Run();
 
-public partial class Program; // exposed for WebApplicationFactory in integration tests
+public partial class Program;

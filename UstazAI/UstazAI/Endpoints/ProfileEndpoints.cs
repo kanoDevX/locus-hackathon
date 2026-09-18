@@ -26,12 +26,6 @@ public static class ProfileEndpoints
             return Results.Ok(await sender.Send(cmd, ct));
         });
 
-        // Resolves the caller's own profile without already knowing its id — the frontend calls
-        // this once after login (or whenever its cached activeProfileId is empty) so a returning
-        // user's second device/browser, or a client that lost its cached id, lands back on their
-        // real profile instead of silently starting a duplicate one. 200 with a null body when
-        // the account has no profile yet (a legitimate first-time state), never a 404 — unlike
-        // `/{profileId}` there's no specific id being looked up and missed here.
         group.MapGet("/mine", async (ICurrentUser user, ISender sender, CancellationToken ct) =>
             Results.Ok(await sender.Send(new GetMyProfileQuery(user.UserId!.Value), ct)));
 

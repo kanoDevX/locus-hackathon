@@ -17,15 +17,10 @@ interface WizardProgress {
 }
 
 interface JourneyState {
-  /** Program ids that just changed in a recommendation delta — read by RecommendationCard to
-   * apply a brief highlight pulse instead of a silent re-render (§5 diff experience). */
   recentlyChangedProgramIds: Set<number>;
   diffPanel: DiffPanelContent | null;
   personaTone: PersonaTone;
   selectedProgramIds: number[];
-  /** Current step of whichever multi-step form is active, read by the focused onboarding header
-   * (journey/layout.tsx) so the "Step X of Y" indicator lives in one place at the top of the
-   * viewport instead of duplicated inside each wizard. Null when no wizard is mounted. */
   wizardProgress: WizardProgress | null;
   showDiffPanel: (content: DiffPanelContent) => void;
   dismissDiffPanel: () => void;

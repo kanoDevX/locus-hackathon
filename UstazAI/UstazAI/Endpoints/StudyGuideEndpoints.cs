@@ -6,8 +6,6 @@ namespace UstazAI.Endpoints;
 
 public sealed record GenerateStudyGuideRequestDto(bool ForceRegenerate = false);
 
-/// <summary>Full-screen "how do I learn this" study guide (§ UX request), one per roadmap task,
-/// persisted so it's read-later rather than regenerated on every visit.</summary>
 public static class StudyGuideEndpoints
 {
     public static void MapStudyGuideEndpoints(this IEndpointRouteBuilder app)

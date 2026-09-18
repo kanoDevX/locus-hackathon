@@ -30,9 +30,6 @@ export default function RecommendationsPage() {
 
   const recommendations = latest && latest.length > 0 ? latest : (generate.data?.recommendations ?? latest);
 
-  // Affordability & Fairness Audit (§10.6) — computed client-side from whichever batch is showing
-  // (freshly generated or the cached GET) so it's always consistent with what's actually on
-  // screen, rather than trusting a separately-fetched aggregate that could point at a stale batch.
   const affordabilityCounts = recommendations?.reduce(
     (acc, r) => {
       if (r.affordabilityTier === "Affordable") acc.affordable++;

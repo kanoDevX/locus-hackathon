@@ -13,9 +13,6 @@ public sealed record InsightsDto(
     double AverageLatencyMs, double P95LatencyMs, long TotalInputTokens, long TotalOutputTokens,
     List<ModuleBreakdownDto> ByModule);
 
-/// <summary>Engineering-maturity endpoint: surfaces p95 latency, Gemini token spend and fallback
-/// rate straight from the AiUsageLog table (§2, §6) so judges can see the product was engineered
-/// around real-world cost/latency constraints, not just demoed once.</summary>
 public sealed class GetInsightsHandler(IAppDbContext db) : IRequestHandler<GetInsightsQuery, InsightsDto>
 {
     public async Task<InsightsDto> Handle(GetInsightsQuery query, CancellationToken ct)

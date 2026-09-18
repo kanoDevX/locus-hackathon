@@ -11,9 +11,6 @@ const COLORS = [
   "bg-[var(--success-500)]",
 ];
 
-/** Advisory strength meter — never blocks submission beyond the backend's real 8-character
- * minimum, just nudges toward a stronger password (§ research recommends this over a hard
- * complexity policy the user can't see the reason for). */
 export function PasswordStrengthMeter({ password }: { password: string }) {
   const t = useTranslations("auth");
   if (!password) return null;

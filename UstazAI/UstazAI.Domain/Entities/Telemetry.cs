@@ -16,12 +16,6 @@ public sealed class AiUsageLog : AuditableEntity<long>
     public string? ErrorMessage { get; set; }
 }
 
-/// <summary>
-/// Append-only, hash-chained log of every scoring/AI decision (see §10.9). Each row hashes
-/// its own payload together with the previous row's hash, so the chain can be walked to prove
-/// no entry was altered after the fact — the concrete backing for "every recommendation this
-/// product has ever given is reproducible and auditable".
-/// </summary>
 public sealed class AiDecisionLog : AuditableEntity<long>
 {
     public Guid StudentProfileId { get; set; }

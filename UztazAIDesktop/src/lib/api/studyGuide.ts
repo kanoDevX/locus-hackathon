@@ -7,9 +7,6 @@ import type { StudyGuideDto } from "./types";
 export function useStudyGuide(profileId: string | null | undefined, taskId: number | null | undefined) {
   return useQuery({
     queryKey: ["studyGuide", profileId, taskId],
-    // Empty body (no guide generated yet) → undefined from apiFetch, coalesced to null — a
-    // legitimate "not generated yet" state, not an error (see profile.ts's useMyProfile for the
-    // same pattern and why).
     queryFn: async () => (await apiFetch<StudyGuideDto | undefined>(`/api/v1/profile/${profileId}/roadmap/tasks/${taskId}/study-guide`)) ?? null,
     enabled: !!profileId && !!taskId,
   });

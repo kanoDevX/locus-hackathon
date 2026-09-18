@@ -210,7 +210,6 @@ public sealed class UstazDbContext(DbContextOptions<UstazDbContext> options) : D
             e.HasIndex(x => x.CreatedAtUtc);
         });
 
-        // Enums stored as their string names — far more debuggable in raw SQL than magic ints.
         b.Entity<StudentProfile>().Property(x => x.PreferredLanguage).HasConversion<string>().HasMaxLength(10);
         b.Entity<StudentProfile>().Property(x => x.BudgetBand).HasConversion<string>().HasMaxLength(20);
         b.Entity<StudentProfile>().Property(x => x.PersonaTone).HasConversion<string>().HasMaxLength(20);

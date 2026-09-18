@@ -6,9 +6,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Tests;
 
-/// <summary>Affordability & Fairness Audit (§10.6) — HybridScoringEngine.EvaluateAffordability is
-/// the deterministic source of truth both the Recommendation entity's persisted tier and
-/// FinancialFitScore are derived from, so its three tier boundaries are covered directly.</summary>
 public class AffordabilityAssessmentTests
 {
     private static StudentProfile MakeProfile(BudgetBand budget) => new()
@@ -45,7 +42,6 @@ public class AffordabilityAssessmentTests
     [Fact]
     public void EvaluateAffordability_WhenEffectiveCostIsWithinCeiling_TierIsAffordable()
     {
-        // BudgetBand.Low ceiling is $6,000/yr.
         var profile = MakeProfile(BudgetBand.Low);
         var program = MakeProgram(tuition: 3000m, living: 2000m);
 
@@ -59,7 +55,6 @@ public class AffordabilityAssessmentTests
     [Fact]
     public void EvaluateAffordability_WhenEffectiveCostExceedsCeilingByLessThanHalf_TierIsStretch()
     {
-        // $8,000 effective cost vs a $6,000 ceiling — 33% over, within the 50% stretch band.
         var profile = MakeProfile(BudgetBand.Low);
         var program = MakeProgram(tuition: 5000m, living: 3000m);
 
@@ -71,7 +66,6 @@ public class AffordabilityAssessmentTests
     [Fact]
     public void EvaluateAffordability_WhenEffectiveCostExceedsCeilingByMoreThanHalf_TierIsOverBudget()
     {
-        // $20,000 effective cost vs a $6,000 ceiling — more than 50% over.
         var profile = MakeProfile(BudgetBand.Low);
         var program = MakeProgram(tuition: 15000m, living: 5000m);
 
@@ -83,7 +77,6 @@ public class AffordabilityAssessmentTests
     [Fact]
     public void EvaluateAffordability_AccountsForScholarshipCoverage()
     {
-        // $30,000 total cost, but a 100%-covering scholarship makes it fully affordable.
         var profile = MakeProfile(BudgetBand.Low);
         var program = MakeProgram(tuition: 20000m, living: 10000m, scholarship: true, scholarshipPct: 100m);
 
@@ -114,8 +107,6 @@ public class AffordabilityAssessmentTests
     [Fact]
     public void GrantOnly_IgnoresBudgetBand_AndTiersByGrantCoverage()
     {
-        // A "Low" budget would call a $40k program OverBudget — but a grant-only applicant isn't
-        // paying tuition from a budget; only coverage matters.
         var profile = MakeProfile(BudgetBand.Low);
         profile.FundingTrackPreference = FundingTrackPreference.GrantOnly;
 

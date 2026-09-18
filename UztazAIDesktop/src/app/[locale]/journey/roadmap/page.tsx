@@ -25,8 +25,6 @@ export default function RoadmapPage() {
   const generatePrepPlan = useGeneratePrepPlan(profileId);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
 
-  // Every roadmap task carries its ProgramId — the prep-plan trigger targets whichever program
-  // the current roadmap was actually built for (§13), not a separately re-picked one.
   const roadmapProgramId = tasks?.find((t) => t.programId != null)?.programId ?? null;
 
   async function buildFor(programId: number) {
@@ -41,10 +39,6 @@ export default function RoadmapPage() {
     if (!roadmapProgramId) return;
     try {
       const created = await generatePrepPlan.mutateAsync(roadmapProgramId);
-      // The endpoint returns 200 with an empty array (not an error) when there's nothing to
-      // build — e.g. a document-only admission track with no exam scores, or every subject
-      // already clearing its threshold. Silence there reads as "broken", so it needs its own
-      // message rather than falling through to the generic success/nothing-happened case.
       if (created.length === 0) toast.info(t("prepPlanEmpty"));
       else toast.success(t("prepPlanSuccess", { count: created.length }));
     } catch (err) {

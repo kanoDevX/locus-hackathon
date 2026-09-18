@@ -12,13 +12,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>
-/// End-to-end walk of the whole mandatory journey (§4 / §7): profile -> diagnostics ->
-/// recommendations -> comparison -> roadmap -> next action, plus the hard "changing one survey
-/// answer visibly changes recommendations" requirement. Requires a reachable SQL Server /
-/// LocalDB instance (see UstazApiFactory) — this is the "critical judge test scenario" the
-/// submission checklist asks for.
-/// </summary>
 public sealed class JourneyIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private HttpClient CreateClient() => factory.CreateClient();
@@ -82,8 +75,6 @@ public sealed class JourneyIntegrationTests(UstazApiFactory factory) : IClassFix
         var nextAction = await nextActionResponse.Content.ReadFromJsonAsync<RoadmapTaskDto>(TestJson.Options);
         nextAction.Should().NotBeNull();
 
-        // Hard requirement: changing one survey answer visibly and traceably changes
-        // recommendations. Lower the budget band drastically and confirm the diff + delta.
         var updateRequest = profileRequest with { ProfileId = profileId, BudgetBand = BudgetBand.Low };
         var updateResponse = await client.PostAsJsonAsync("/api/v1/profile", updateRequest, TestJson.Options);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);

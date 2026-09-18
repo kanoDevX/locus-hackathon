@@ -22,11 +22,6 @@ public sealed class ReviewEssayValidator : AbstractValidator<ReviewEssayCommand>
     }
 }
 
-/// <summary>
-/// Essay help (case brief baseline feature): feedback only, never a rewritten draft — admissions
-/// offices actively screen for AI-generated essays, so both the Gemini prompt and the
-/// deterministic fallback are structurally incapable of returning a replacement essay.
-/// </summary>
 public sealed class ReviewEssayHandler(IAppDbContext db, IAiReasoningService ai, DecisionLedgerWriter ledger, ICurrentUser user, ILogger<ReviewEssayHandler> logger)
     : IRequestHandler<ReviewEssayCommand, EssayReviewDto>
 {

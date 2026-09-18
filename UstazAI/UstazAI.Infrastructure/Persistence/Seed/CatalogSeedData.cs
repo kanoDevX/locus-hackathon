@@ -4,14 +4,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Infrastructure.Persistence.Seed;
 
-/// <summary>
-/// Demo/illustrative catalog for the committed persona: an 11th-grade Kazakhstani student
-/// exploring undergraduate options at home and abroad. Universities are real institutions;
-/// tuition, deadlines, admit rates and salaries are approximate, illustrative figures for demo
-/// purposes (see DataProvenance.IsDemoData = true on every row — §3 hard constraint on never
-/// asserting a fact without a source or demo flag). Deadlines are generated relative to "today"
-/// so the product stays realistic no matter when a judge runs it.
-/// </summary>
 public static class CatalogSeedData
 {
     private sealed record ProgramSeed(
@@ -19,19 +11,12 @@ public static class CatalogSeedData
         decimal TuitionUsd, decimal LivingUsd, int DeadlineDaysFromNow,
         decimal? MinGpa, List<ExamRequirement> Exams,
         bool ScholarshipAvailable, decimal ScholarshipPct, decimal AdmitRatePct, decimal? StartingSalaryUsd,
-        // Populated only for domestic (Kazakhstan) programs — the ENT/grant-eligibility system
-        // (§12) doesn't apply to foreign programs at all.
         List<AdmissionThresholdSeed>? Thresholds = null);
 
-    /// <summary>One row of the seeded three-tier threshold model (§2/§12.1) for one program under
-    /// one admission track. Figures are illustrative/demo — see DataProvenance on the resulting
-    /// AdmissionThreshold row.</summary>
     private sealed record AdmissionThresholdSeed(
         AdmissionExamTrack Track, decimal State, decimal University,
         decimal CutoffMin, decimal CutoffMax, decimal CutoffMedian, int SampleSize);
 
-    // Coordinates/Environment are optional and trailing (§14) — only a representative subset of
-    // universities is seeded with map data (see README), so most calls below simply omit them.
     private sealed record UniversitySeed(
         string Name, string Country, string City, string? Url, List<ProgramSeed> Programs,
         GeoCoordinates? Coordinates = null, EnvironmentProfile? Environment = null);
@@ -92,8 +77,6 @@ public static class CatalogSeedData
                     scholarships.Add(scholarship);
                 }
 
-                // Attached via the navigation collection (not a flat FK value) so EF Core fixes
-                // up ProgramId automatically on SaveChanges — program.Id doesn't exist yet here.
                 var programArchetypes = BuildArchetypesFor(p.MinGpa, p.Exams);
                 foreach (var a in programArchetypes) program.AdmitArchetypes.Add(a);
                 archetypes.AddRange(programArchetypes);

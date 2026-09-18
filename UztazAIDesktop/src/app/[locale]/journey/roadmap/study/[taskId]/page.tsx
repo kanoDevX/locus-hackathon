@@ -16,13 +16,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DemoDataBadge } from "@/components/journey/demo-data-badge";
 import { fadeInUp, fadeIn } from "@/lib/motion";
 
-/**
- * Full-screen "how do I actually learn this" study guide (§ UX request) — a dedicated route
- * (not a dialog) reached from a SubjectPrep roadmap task's "Learn this" button. Generated once
- * and persisted server-side, so navigating back here later re-reads the same plan instead of
- * generating a new one on every visit. Each step links to a real YouTube *search*, never a
- * specific invented video (see StudyGuideStepDto's own doc comment for why).
- */
 export default function StudyGuidePage({ params }: { params: Promise<{ taskId: string }> }) {
   const { taskId: taskIdParam } = use(params);
   const taskId = Number(taskIdParam);

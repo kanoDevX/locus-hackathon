@@ -21,8 +21,6 @@ public static class SystemEndpoints
             Results.Ok(await sender.Send(new GetInsightsQuery(), ct)))
             .RequireAuthorization();
 
-        // Judge Sandbox Mode (§5.8) — guarded to the Judge role so a demo can always be reset
-        // to a known scripted starting state.
         group.MapPost("/demo-reset", async (ICurrentUser user, ISender sender, CancellationToken ct) =>
             Results.Ok(await sender.Send(new DemoResetCommand(user.UserId!.Value), ct)))
             .RequireAuthorization(p => p.RequireRole("Judge"));

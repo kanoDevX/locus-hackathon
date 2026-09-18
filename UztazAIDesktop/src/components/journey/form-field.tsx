@@ -1,8 +1,5 @@
 import { Label } from "@/components/ui/input";
 
-/** Accessible field wrapper: wires aria-invalid / aria-describedby from the error message onto
- * whatever input is passed as a child, and renders the error inline next to the field in plain
- * language (§ research: inline errors next to the field, human-readable, not just a red border). */
 export function FormField({
   id,
   label,

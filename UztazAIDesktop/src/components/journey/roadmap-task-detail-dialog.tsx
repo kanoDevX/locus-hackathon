@@ -30,12 +30,6 @@ const RESOURCE_ICON: Record<ResourceType, React.ElementType> = {
   Course: BookMarked,
 };
 
-/**
- * Full-detail view for one roadmap task (§ UX request: "detailed roadmap you can click into, with
- * full info" — the pattern every task-tracking app from Linear to Trello uses: a compact card in
- * the list, a complete record behind a click). Reuses the same category icon map and status
- * language as RoadmapTaskCard rather than re-deriving any of it.
- */
 export function RoadmapTaskDetailDialog({
   task,
   open,
@@ -55,9 +49,6 @@ export function RoadmapTaskDetailDialog({
 }) {
   const t = useTranslations("roadmap");
   const router = useRouter();
-  // useState's lazy initializer is the React-sanctioned place to read an impure value like
-  // Date.now() exactly once, keeping the render body itself pure across re-renders (same
-  // pattern as RoadmapTaskCard).
   const [now] = useState(() => Date.now());
 
   if (!task) return null;
@@ -97,7 +88,6 @@ export function RoadmapTaskDetailDialog({
           )}
         </div>
 
-        
           <Button
             className="mt-4 w-full"
             onClick={() => {
@@ -108,7 +98,6 @@ export function RoadmapTaskDetailDialog({
             <Sparkles className="size-4" />
             {t("learnThis")}
           </Button>
-        
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <ScoreMeter icon={Zap} label={t("urgencyLabel")} value={task.urgencyScore} />

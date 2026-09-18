@@ -4,9 +4,6 @@ using UstazAI.Application.Common.Interfaces;
 
 namespace UstazAI.Endpoints;
 
-/// <summary>University map & environment intelligence (§14). Also folded directly into
-/// POST /api/v1/comparison (§4 stage 5) — see ProgramComparisonRowDto.CampusMap — rather than
-/// existing only as a disconnected standalone screen.</summary>
 public static class CampusMapEndpoints
 {
     public static void MapCampusMapEndpoints(this IEndpointRouteBuilder app)

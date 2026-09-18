@@ -11,11 +11,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers §13 (result-aware chat + gap-to-course roadmap): a student who already has an
-/// eligibility verdict on file can generate a deterministic subject-prep plan and chat about their
-/// own results — both paths must degrade gracefully to a deterministic fallback when Gemini is
-/// unavailable (no API key configured for the test host), the same graceful-degradation contract
-/// every other AI-backed feature in the product already honors.</summary>
 public sealed class ClusterBIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, Guid ProfileId, int ProgramId)> SetupWithEligibilityAsync()
@@ -43,9 +38,6 @@ public sealed class ClusterBIntegrationTests(UstazApiFactory factory) : IClassFi
 
         var calculateResponse = await client.PostAsync($"/api/v1/profile/{profileId}/exam-intake/calculate", null);
         var verdicts = await calculateResponse.Content.ReadFromJsonAsync<List<EligibilityResultDto>>(TestJson.Options);
-        // Nazarbayev CS has the highest university threshold (100) in the seeded catalog — a
-        // score of 90 falls short there, guaranteeing real headroom for GapAnalysisEngine, unlike
-        // the easier programs a score of 90 already clears outright.
         var programId = verdicts!.First(v => v.Program.UniversityName == "Nazarbayev University").Program.ProgramId;
 
         return (client, profileId, programId);
@@ -112,7 +104,7 @@ public sealed class ClusterBIntegrationTests(UstazApiFactory factory) : IClassFi
         historyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var history = await historyResponse.Content.ReadFromJsonAsync<List<ChatMessageDtoForTest>>(TestJson.Options);
 
-        history.Should().HaveCount(4); // 2 user + 2 assistant
+        history.Should().HaveCount(4);
         history![0].Role.Should().Be(ChatRole.User);
         history[0].Content.Should().Be("First question");
         history[1].Role.Should().Be(ChatRole.Assistant);
@@ -120,7 +112,4 @@ public sealed class ClusterBIntegrationTests(UstazApiFactory factory) : IClassFi
     }
 }
 
-/// <summary>Local read shape mirroring ChatMessageDto's public fields — the real DTO is a mutable
-/// class (needed for GuardrailBehavior's in-place SanitizeAiText), which deserializes fine via a
-/// matching record for test assertions.</summary>
 public sealed record ChatMessageDtoForTest(int Id, ChatRole Role, string Content, bool IsAiGenerated, bool FallbackUsed, DateTime CreatedAtUtc);

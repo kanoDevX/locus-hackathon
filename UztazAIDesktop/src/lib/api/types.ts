@@ -1,4 +1,3 @@
-/** Mirrors the DTOs exposed by the UstazAI ASP.NET Core backend (see ../../backend/UstazAI). */
 
 export type Locale = "Ru" | "Kk" | "En";
 export type BudgetBand = "Low" | "Medium" | "High" | "VeryHigh";
@@ -8,8 +7,6 @@ export type RoadmapTaskCategory = "Exam" | "Document" | "Application" | "Activit
 export type RoadmapTaskStatus = "NotStarted" | "InProgress" | "Blocked" | "Done";
 export type UserRole = "Student" | "Judge" | "Admin";
 export type AdmitOutcome = "Admitted" | "Waitlisted" | "Rejected";
-
-// --- §12 Placement & Eligibility Intake ------------------------------------------------------
 
 export type EducationStage = "SchoolGrade9" | "SchoolGrade10" | "SchoolGrade11" | "CollegeStudent" | "CollegeGraduate";
 export type AdmissionExamTrack =
@@ -79,8 +76,6 @@ export interface EligibilityResultDto {
   provenance: DataProvenanceDto;
 }
 
-// --- §13 Result-Aware Chat + Gap-to-Course Prep ----------------------------------------------
-
 export interface ResourceLinkDto {
   title: string;
   url: string;
@@ -96,8 +91,6 @@ export interface ChatMessageDto {
   fallbackUsed: boolean;
   createdAtUtc: string;
 }
-
-// --- §14 University Map & Environment Intelligence -------------------------------------------
 
 export interface GeoCoordinatesDto {
   latitude: number;
@@ -298,7 +291,6 @@ export interface RoadmapTaskDto {
   urgencyScore: number;
   impactScore: number;
   prerequisiteTaskIds: number[];
-  /** Only set for category === "SubjectPrep" (§13). */
   subject: string | null;
   resources: ResourceLinkDto[];
   programId: number | null;
@@ -375,17 +367,12 @@ export interface InsightsDto {
   byModule: { module: string; calls: number; successRatePercent: number; fallbackRatePercent: number }[];
 }
 
-// --- Study guide (full-screen "how do I learn this", one per SubjectPrep roadmap task) --------
-
 export interface StudyGuideStepDto {
   stepNumber: number;
   title: string;
   description: string;
   estimatedMinutes: number;
   videoSearchQuery: string;
-  /** A real, functional YouTube *search* link — never a specific video. No video-metadata API is
-   * wired up, so a specific title/id/thumbnail would have to be invented; this product doesn't
-   * fabricate facts. */
   youTubeSearchUrl: string;
 }
 

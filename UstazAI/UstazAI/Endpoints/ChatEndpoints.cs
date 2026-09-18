@@ -6,8 +6,6 @@ namespace UstazAI.Endpoints;
 
 public sealed record ChatRequestDto(string Message);
 
-/// <summary>Result-aware AI chat (§13.1) — every reply is grounded in the caller's own
-/// already-computed eligibility/diagnostics data, never a general-purpose open chat.</summary>
 public static class ChatEndpoints
 {
     public static void MapChatEndpoints(this IEndpointRouteBuilder app)

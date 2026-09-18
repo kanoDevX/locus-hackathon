@@ -24,8 +24,6 @@ export function useNotifications(profileId: string | null | undefined, withinDay
   });
 }
 
-/** Direct download link for the .ics export — the token must be attached, so this builds a
- * fetch-and-save flow rather than a plain <a href>. */
 export async function downloadCalendarIcs(profileId: string) {
   const token = useAuthStore.getState().accessToken;
   const response = await fetch(`${API_BASE_URL}/api/v1/profile/${profileId}/calendar.ics`, {

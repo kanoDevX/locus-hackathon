@@ -10,11 +10,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Application.Ops;
 
-/// <summary>
-/// Judge Sandbox Mode (§5.8): instantly resets the calling account's demo profile to a known,
-/// scripted state matching the jury's official test script, so a live 5-minute demo slot never
-/// depends on whatever state a previous run left behind.
-/// </summary>
 public sealed record DemoResetCommand(Guid UserId) : IRequest<ProfileDto>;
 
 public sealed class DemoResetHandler(IAppDbContext db) : IRequestHandler<DemoResetCommand, ProfileDto>
@@ -74,8 +69,6 @@ public sealed class DemoResetHandler(IAppDbContext db) : IRequestHandler<DemoRes
         db.StudentProfiles.Add(demoProfile);
         await db.SaveChangesAsync(ct);
 
-        // Pre-populated exam intake (§12) so a judge sees a real eligibility verdict immediately
-        // via POST /exam-intake/calculate, without first filling out the wizard by hand.
         db.ExamRecords.Add(new ExamRecord
         {
             StudentProfileId = demoProfile.Id,

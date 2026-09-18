@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import "leaflet/dist/leaflet.css";
 
-/** Free interactive map (Leaflet + CARTO basemap over OpenStreetMap data — no API key, no
- * account) with a branded pin on the university and a label. Follows the light/dark theme. */
 export function UniversityMap({
   lat,
   lon,
@@ -49,7 +47,6 @@ export function UniversityMap({
           <circle cx="17" cy="16.5" r="6.5" fill="#fff"/></svg>`,
       });
 
-      // Textual content is escaped by building DOM nodes, never interpolated as HTML.
       const label = document.createElement("div");
       const strong = document.createElement("strong");
       strong.textContent = name;

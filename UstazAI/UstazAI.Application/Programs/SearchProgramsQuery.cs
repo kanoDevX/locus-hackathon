@@ -13,13 +13,6 @@ public sealed record SearchProgramsQuery(
     string? Query, string? Country, string? FieldOfStudy, DegreeLevel? DegreeLevel,
     decimal? MaxTuitionUsd, bool? ScholarshipOnly) : IRequest<List<ProgramSummaryDto>>;
 
-/// <summary>
-/// Catalog browse/search — lets a student explore the seeded programs directly (school-list
-/// building), not only through the AI-ranked recommendation flow. The unfiltered catalog is
-/// cached in memory for 5 minutes (§2 Caching: "IMemoryCache for hot recommendation results") —
-/// the seed catalog is effectively static during a demo, so this trades a small staleness window
-/// for far fewer DB round trips on the hottest read path in the API.
-/// </summary>
 public sealed class SearchProgramsHandler(IAppDbContext db, IMemoryCache cache)
     : IRequestHandler<SearchProgramsQuery, List<ProgramSummaryDto>>
 {

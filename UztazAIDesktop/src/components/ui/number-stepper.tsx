@@ -4,10 +4,6 @@ import * as React from "react";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** +/- stepper with a direct-entry numeric field in the middle — the pattern most native and
- * web apps use for small-range, precise numbers (age, score, GPA) instead of a bare
- * `<input type="number">`, whose browser-native spinners are tiny, inconsistent across browsers,
- * and easy to misclick. Typing a value directly still works; the buttons are for quick nudges. */
 export const NumberStepper = React.forwardRef<
   HTMLInputElement,
   {
@@ -27,7 +23,6 @@ export const NumberStepper = React.forwardRef<
     return Math.min(max, Math.max(min, v));
   }
 
-  // Rounds to the step's own precision to avoid classic floating-point drift (0.1 + 0.2 = 0.30000000000000004).
   function roundToStep(v: number) {
     const decimals = (step.toString().split(".")[1] ?? "").length;
     return Number(v.toFixed(decimals));

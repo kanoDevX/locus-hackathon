@@ -34,9 +34,6 @@ export interface RefreshProgramFromWebResult {
   sourceUrls: string[];
 }
 
-/** Live, source-cited refresh of one program's figures (Gemini + Google Search), saved server-side
- * so it's reused afterwards without another AI call. Recommendations are regenerated afterwards
- * so scores, affordability and provenance all reflect the new numbers. */
 export function useRefreshProgramFromWeb(profileId: string | null | undefined) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -49,8 +46,6 @@ export function useRefreshProgramFromWeb(profileId: string | null | undefined) {
   });
 }
 
-/** "Update everything" — refreshes each given program one after another (not in parallel, to stay
- * inside API rate limits), skipping ones that fail, then regenerates recommendations once. */
 export function useRefreshAllProgramsFromWeb(profileId: string | null | undefined) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -74,9 +69,6 @@ export function useRefreshAllProgramsFromWeb(profileId: string | null | undefine
   });
 }
 
-/** Live web research of one program's ENT/grant thresholds (state threshold, the program's own
- * minimum, recent grant cutoffs), saved server-side. Callers re-run the eligibility calculation
- * afterwards, since verdicts are snapshots of the numbers at calculation time. */
 export function refreshThresholdsFromWeb(programId: number, track: string) {
   return apiFetch<{ updatedFields: string[]; sourceNames: string[] }>(
     `/api/v1/programs/${programId}/refresh-thresholds-from-web`,
@@ -84,8 +76,6 @@ export function refreshThresholdsFromWeb(programId: number, track: string) {
   );
 }
 
-/** Refresh one program's figures without regenerating recommendations (used by screens that
- * re-fetch their own data afterwards, e.g. the comparison table). */
 export function refreshProgramFromWebOnly(programId: number) {
   return apiFetch<RefreshProgramFromWebResult>(`/api/v1/programs/${programId}/refresh-from-web`, { method: "POST" });
 }

@@ -19,8 +19,6 @@ export const registerSchema = z
   });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
-/** Advisory only — the backend only requires 8+ characters (see registerSchema above); this
- * just nudges toward a stronger password without blocking submission on anything beyond that. */
 export function passwordStrength(password: string): { score: 0 | 1 | 2 | 3 | 4; label: string } {
   let score = 0;
   if (password.length >= 8) score++;

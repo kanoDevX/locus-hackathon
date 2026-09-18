@@ -14,13 +14,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fadeInUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-/**
- * Result-aware AI chat (§13). Every reply is grounded server-side in the caller's own
- * already-computed eligibility/diagnostics data — this panel is just a thin message list + input,
- * it never has its own client-side "context" to manage. See src/lib/api/chat.ts for why this is a
- * plain request/response mutation rather than a streaming hook (the backend returns one complete
- * JSON reply per call, matching the rest of the product's AI-backed endpoints).
- */
 export function ChatPanel() {
   const t = useTranslations("chat");
   const profileId = useAuthStore((s) => s.activeProfileId);

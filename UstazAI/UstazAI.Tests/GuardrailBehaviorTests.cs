@@ -6,16 +6,6 @@ using MediatR;
 
 namespace UstazAI.Tests;
 
-/// <summary>
-/// Locks in a real bug found by code audit: RecommendationDto, DiagnosticsDto and StudyGuideDto
-/// carried Gemini-narrated free text but never implemented ISanitizableAiResponse, so
-/// GuardrailBehavior's last-resort forbidden-language net (§5.3) silently never ran on them —
-/// the single highest-risk surface (admission-probability narration) had no guardrail at all.
-/// Also covers GetLatestRecommendationsQuery's response shape specifically: it returns a bare
-/// `List&lt;RecommendationDto&gt;`, which can never itself implement the marker interface (you
-/// cannot add an interface to a BCL collection type), so GuardrailBehavior needed to recurse into
-/// enumerable responses too, not just check the top-level response's own type.
-/// </summary>
 public class GuardrailBehaviorTests
 {
     private const string Forbidden = "This program guarantees admission for top students.";
@@ -88,9 +78,6 @@ public class GuardrailBehaviorTests
     [Fact]
     public async Task GuardrailBehavior_SanitizesEveryItemInABareListResponse()
     {
-        // GetLatestRecommendationsQuery : IRequest<List<RecommendationDto>> — the response type
-        // IS the list, so only GuardrailBehavior's IEnumerable recursion (not the top-level
-        // ISanitizableAiResponse check alone) can reach each RecommendationDto inside it.
         var behavior = new GuardrailBehavior<FakeListRequest, List<RecommendationDto>>();
         var recommendations = new List<RecommendationDto> { Recommendation(), Recommendation() };
 

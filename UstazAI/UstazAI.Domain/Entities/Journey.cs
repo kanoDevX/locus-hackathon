@@ -18,11 +18,6 @@ public sealed class Diagnostics : AuditableEntity<int>
     public bool FallbackUsed { get; set; }
 }
 
-/// <summary>
-/// One ranked program for one profile snapshot. The explanation is a structured object
-/// (four sub-scores + provenance), never a free-text blob, so the frontend can render it and
-/// judges can audit exactly which factor drove the ranking.
-/// </summary>
 public sealed class Recommendation : AuditableEntity<int>
 {
     public Guid StudentProfileId { get; set; }
@@ -50,18 +45,11 @@ public sealed class Recommendation : AuditableEntity<int>
     public bool IsAiNarrated { get; set; }
     public bool FallbackUsed { get; set; }
 
-    // Affordability & Fairness Audit (§10.6) — snapshotted at generation time from
-    // HybridScoringEngine.EvaluateAffordability, the same computation FinancialFitScore above is
-    // itself derived from, so the two can never silently disagree.
     public AffordabilityTier AffordabilityTier { get; set; }
     public decimal AffordabilityEffectiveCostUsd { get; set; }
     public decimal AffordabilityBudgetCeilingUsd { get; set; }
 }
 
-/// <summary>One turn of the result-aware chat (§13). Scoped by design: every assistant reply is
-/// generated from the caller's own already-computed eligibility/diagnostics data (see
-/// SendChatMessageCommand), never a general-purpose open chat, and every assistant message still
-/// passes through GuardrailBehavior like any other AI-derived text in the product.</summary>
 public sealed class ChatMessage : AuditableEntity<int>
 {
     public Guid StudentProfileId { get; set; }

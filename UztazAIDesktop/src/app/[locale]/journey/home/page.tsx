@@ -32,13 +32,6 @@ const FEATURES = [
   { href: "/journey/insights", icon: Activity, key: "insights" },
 ] as const;
 
-/**
- * The hub every completed-intake session lands on (§ UX request: "main window" after the
- * wizard). Surfaces the two things that actually change session to session — the single
- * highest-priority task, and the latest eligibility read — then a stable grid of every other
- * feature so nothing is more than one click away. This is deliberately a dashboard, not another
- * linear step: once intake is done the product stops forcing a fixed order.
- */
 export default function HomePage() {
   const t = useTranslations("home");
   const tNav = useTranslations("nav");

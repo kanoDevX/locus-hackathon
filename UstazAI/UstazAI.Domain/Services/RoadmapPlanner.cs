@@ -3,8 +3,6 @@ using UstazAI.Domain.Enums;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>Draft roadmap node keyed by a local string so prerequisite edges (§4 stage 6, DAG)
-/// can be wired up before real database ids exist.</summary>
 public sealed record RoadmapTaskDraft(
     string Key,
     string Title,
@@ -15,10 +13,6 @@ public sealed record RoadmapTaskDraft(
     int ImpactScore,
     List<string> PrerequisiteKeys);
 
-/// <summary>
-/// Deterministic roadmap generator: deadlines are backward-calculated from the program's real
-/// application deadline, and prerequisite edges form a genuine DAG rather than a flat checklist.
-/// </summary>
 public static class RoadmapPlanner
 {
     public static List<RoadmapTaskDraft> BuildRoadmap(StudentProfile profile, ProgramOffering program)

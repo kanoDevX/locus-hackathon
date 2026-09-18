@@ -9,9 +9,6 @@ namespace UstazAI.Application.Scholarships;
 public sealed record SearchScholarshipsQuery(
     string? Country, decimal? MinCoveragePercent, string? Query) : IRequest<List<ScholarshipSearchResultDto>>;
 
-/// <summary>Standalone scholarship matching — the case brief's own suggested baseline feature,
-/// previously only reachable indirectly through a program's recommendation. No AI call: a plain
-/// filtered catalog query.</summary>
 public sealed class SearchScholarshipsHandler(IAppDbContext db)
     : IRequestHandler<SearchScholarshipsQuery, List<ScholarshipSearchResultDto>>
 {

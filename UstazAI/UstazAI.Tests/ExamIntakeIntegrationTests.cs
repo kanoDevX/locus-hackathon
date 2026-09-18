@@ -11,9 +11,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers the new front door (§12): exam intake -> eligibility calculation -> result,
-/// across the school/StandardEnt path and the college/ContinuingSpecialtyPaid path, plus the
-/// validation guarding the branch-specific rules.</summary>
 public sealed class ExamIntakeIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, Guid ProfileId)> SetupAsync()
@@ -102,10 +99,6 @@ public sealed class ExamIntakeIntegrationTests(UstazApiFactory factory) : IClass
         var intakeResponse = await client.PostAsJsonAsync($"/api/v1/profile/{profileId}/exam-intake", intakeRequest, TestJson.Options);
         intakeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        // Kazakhstan's ENT/grant system is inapplicable by definition for this track, not merely
-        // unmet — the domestic-verdict list comes back empty (not an error), and the caller's job
-        // is to route these students to Recommendations instead (country-agnostic, no ExamRecord
-        // dependency), never a fabricated "failed the ENT" reading.
         var calculateResponse = await client.PostAsync($"/api/v1/profile/{profileId}/exam-intake/calculate", null);
         calculateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var verdicts = await calculateResponse.Content.ReadFromJsonAsync<List<EligibilityResultDto>>(TestJson.Options);
@@ -117,7 +110,6 @@ public sealed class ExamIntakeIntegrationTests(UstazApiFactory factory) : IClass
     {
         var (client, profileId) = await SetupAsync();
 
-        // A school-grade applicant can never submit a college-only track.
         var invalidRequest = new ExamIntakeRequestDto(
             EducationStage.SchoolGrade11, AdmissionExamTrack.ContinuingSpecialtyGrant,
             SubjectBreakdown: [], TotalScore: 30, ExamDateTaken: null, CollegeBackground: null,

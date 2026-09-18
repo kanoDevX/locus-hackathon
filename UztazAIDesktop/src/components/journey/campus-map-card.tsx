@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 import { DemoDataBadge } from "@/components/journey/demo-data-badge";
 import type { CampusMapDto } from "@/lib/api/types";
 
-// Leaflet touches `window`, so it must only load in the browser.
 const UniversityMap = dynamic(() => import("@/components/journey/university-map").then((m) => m.UniversityMap), {
   ssr: false,
   loading: () => <div className="h-64 w-full animate-pulse rounded-[var(--radius-md)] bg-[var(--surface-raised)]" />,
@@ -21,9 +20,6 @@ const TRANSIT_VARIANT = {
   Excellent: "success",
 } as const;
 
-/** University Map & Environment Intelligence (§14). Folded into the Comparison screen rather
- * than a disconnected map page — see ComparisonPage's "Map & Environment" tab. A university with
- * no seeded map data shows an honest "not mapped yet" state, never a fabricated location. */
 export function CampusMapCard({ campusMap }: { campusMap: CampusMapDto }) {
   const t = useTranslations("campusMap");
 

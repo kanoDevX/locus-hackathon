@@ -10,8 +10,6 @@ public sealed class User : AuditableEntity<Guid>
     public string DisplayName { get; set; } = default!;
     public UserRole Role { get; set; } = UserRole.Student;
 
-    /// <summary>Nullable, unused today — reserved so a school/NGO tenant can be introduced
-    /// without an architecture change (see README "further development").</summary>
     public Guid? OrganizationId { get; set; }
 
     public List<RefreshToken> RefreshTokens { get; set; } = [];

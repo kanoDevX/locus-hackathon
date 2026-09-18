@@ -8,9 +8,6 @@ public interface ICurrentUser
     string? Email { get; }
     UserRole? Role { get; }
 
-    /// <summary>The language the UI is currently displayed in (X-Locale request header). Wins over
-    /// the profile's stored PreferredLanguage for AI-generated text: a student browsing in Russian
-    /// with a profile saved as English otherwise got English explanations inside a Russian page.</summary>
     Locale? UiLocale { get; }
 }
 

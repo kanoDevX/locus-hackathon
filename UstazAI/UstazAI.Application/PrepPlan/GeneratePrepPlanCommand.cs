@@ -10,13 +10,6 @@ using UstazAI.Domain.Services;
 
 namespace UstazAI.Application.PrepPlan;
 
-/// <summary>
-/// Turns GapAnalysisEngine's ranked subject gaps into discrete SubjectPrep RoadmapTask nodes
-/// (§13) — reusing the existing RoadmapTask DAG/status machinery rather than a second,
-/// forked task table, per the product's own integration discipline. Purely deterministic (no
-/// Gemini call): the gap ranking and the curated resource links both come from code, not the
-/// model, so this runs synchronously like CalculateEligibilityCommand.
-/// </summary>
 public sealed record GeneratePrepPlanCommand(Guid ProfileId, Guid UserId, int ProgramId) : IRequest<List<RoadmapTaskDto>>;
 
 public sealed class GeneratePrepPlanHandler(IAppDbContext db, DecisionLedgerWriter ledger)
@@ -43,8 +36,6 @@ public sealed class GeneratePrepPlanHandler(IAppDbContext db, DecisionLedgerWrit
         var threshold = program.AdmissionThresholds.FirstOrDefault(t => t.Track == examRecord.Track);
         var gaps = GapAnalysisEngine.AnalyzeGaps(examRecord, threshold).Take(MaxPrepTasks).ToList();
 
-        // Same "preserve in-progress work" pattern as RoadmapService: only NotStarted prep tasks
-        // for this program are replaced when the plan is regenerated.
         var staleIds = await db.RoadmapTasks
             .Where(t => t.StudentProfileId == profile.Id && t.ProgramId == cmd.ProgramId
                 && t.Category == RoadmapTaskCategory.SubjectPrep && t.Status == RoadmapTaskStatus.NotStarted)

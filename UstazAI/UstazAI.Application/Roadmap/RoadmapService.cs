@@ -7,11 +7,6 @@ using UstazAI.Domain.Services;
 
 namespace UstazAI.Application.Roadmap;
 
-/// <summary>
-/// Regenerates the roadmap DAG for a (profile, program) pair. Tasks already InProgress or Done
-/// are preserved across regeneration — only NotStarted nodes for that program are replaced —
-/// so re-running this after a profile change never discards the student's real progress.
-/// </summary>
 public sealed class RoadmapService(IAppDbContext db, DecisionLedgerWriter ledger)
 {
     public async Task<List<RoadmapTask>> GenerateAsync(StudentProfile profile, int programId, CancellationToken ct)
@@ -49,7 +44,7 @@ public sealed class RoadmapService(IAppDbContext db, DecisionLedgerWriter ledger
             db.RoadmapTasks.Add(task);
         }
 
-        await db.SaveChangesAsync(ct); // assign real ids before wiring dependency edges
+        await db.SaveChangesAsync(ct);
 
         foreach (var d in drafts)
         {

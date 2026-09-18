@@ -10,11 +10,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers `GET /profile/mine` — the frontend's only way to resolve a returning user's
-/// own profile id without already caching it client-side (see auth-store.ts's activeProfileId,
-/// which is not derived from the session and can be empty after a fresh login on a new device or
-/// after activeProfileId was lost). Without this endpoint the wizard would silently create a
-/// second, orphaned profile for a user who already has one.</summary>
 public sealed class MyProfileIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private static async Task<HttpClient> RegisterAsync(UstazApiFactory factory, string email)

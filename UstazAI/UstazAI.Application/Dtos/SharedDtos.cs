@@ -26,10 +26,6 @@ public sealed record RecommendationDeltaDto(
     bool HasPreviousBatch, int? PreviousProfileVersion, List<int> AddedProgramIds,
     List<int> RemovedProgramIds, List<int> RankChangedProgramIds);
 
-/// <summary>Batch-level rollup of the Affordability & Fairness Audit (§10.6) — how many of THIS
-/// batch's recommendations actually fit the applicant's own stated budget, computed fresh on
-/// every call directly from the just-generated Recommendation rows (never persisted separately,
-/// so it can never drift from the batch it describes).</summary>
 public sealed record AffordabilitySummaryDto(int AffordableCount, int StretchCount, int OverBudgetCount);
 
 public sealed record ProgramSummaryDto(
@@ -39,12 +35,6 @@ public sealed record ProgramSummaryDto(
     bool ScholarshipAvailable, decimal ScholarshipCoveragePercent, decimal TypicalAdmitRatePercent,
     decimal? AverageStartingSalaryUsd);
 
-/// <summary>Mutable (not a record) like ChatMessageDto/EssayReviewDto — this is the single
-/// highest-risk surface for fabricated-certainty language (§5.3: admission-probability
-/// narration), so GuardrailBehavior's SanitizeAiText last-resort net has to be able to run on it
-/// too. It originally couldn't: as a plain record with no ISanitizableAiResponse implementation,
-/// every one of its Gemini-narrated *FitExplanation/NarrativeSummary fields reached the client
-/// completely unfiltered.</summary>
 public sealed class RecommendationDto : ISanitizableAiResponse
 {
     public int RecommendationId { get; set; }
@@ -85,9 +75,6 @@ public sealed record RoadmapTaskDto(
 
 public sealed record ResourceLinkDto(string Title, string Url, ResourceType ResourceType, DataProvenanceDto Provenance);
 
-/// <summary>Mutable (not a record) — see RecommendationDto's doc comment for why: Strengths,
-/// ConstraintsFound and InferredGoal all carry Gemini-narrated free text that needs
-/// GuardrailBehavior's SanitizeAiText last-resort net to run on it.</summary>
 public sealed class DiagnosticsDto : ISanitizableAiResponse
 {
     public int DiagnosticsId { get; set; }
@@ -116,10 +103,6 @@ public sealed record ScholarshipSearchResultDto(
     int ScholarshipId, string Name, decimal CoveragePercent, string EligibilityCriteria,
     DateOnly? DeadlineDate, ProgramSummaryDto? Program, DataProvenanceDto Provenance);
 
-/// <summary>Mutable (not a record) like EssayReviewDto — GuardrailBehavior's SanitizeAiText
-/// mutates Content in place as the last-resort safety net, on top of the explicit
-/// GuardrailRules.Sanitize call the chat handler already makes before persisting (§13), so the
-/// stored ChatMessage row and the returned DTO can never disagree on what text was shown.</summary>
 public sealed class ChatMessageDto : ISanitizableAiResponse
 {
     public int Id { get; set; }

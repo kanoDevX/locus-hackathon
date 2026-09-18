@@ -32,12 +32,8 @@ export default function LoginPage() {
   async function onSubmit(values: LoginFormValues) {
     try {
       await login.mutateAsync(values);
-      // The journey layout guard bounces an account with incomplete intake back to the wizard
-      // automatically, so this can always target the hub — no need to duplicate that check here.
       router.push("/journey/home");
     } catch (err) {
-      // Deliberately generic — the backend never reveals whether the email or the password was
-      // wrong, so this UI doesn't either (avoids account enumeration).
       toast.error(err instanceof ApiError ? err.message : t("loginFailed"));
     }
   }

@@ -19,7 +19,6 @@ export function useGeneratePrepPlan(profileId: string | null | undefined) {
       apiFetch<RoadmapTaskDto[]>(`/api/v1/profile/${profileId}/prep-plan/${programId}`, { method: "POST" }),
     onSuccess: (data, programId) => {
       queryClient.setQueryData(["prepPlan", profileId, programId], data);
-      // Prep tasks are RoadmapTask rows too (§13) — the main roadmap list must reflect them.
       queryClient.invalidateQueries({ queryKey: ["roadmap", profileId] });
       queryClient.invalidateQueries({ queryKey: ["calendar", profileId] });
     },

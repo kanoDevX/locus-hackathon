@@ -14,12 +14,6 @@ export interface IntakeStage {
   status: IntakeStageStatus;
 }
 
-/**
- * Staged progress screen for the intake → eligibility flow (§12 Addendum). Each stage's status is
- * driven directly by a real TanStack Query mutation's own `status` — never a fixed-duration timer
- * standing in for real work, so what the student sees always matches what the backend is actually
- * doing (submit exam intake, then calculate eligibility against the seeded catalog).
- */
 export function IntakeProgressScreen({ stages, title, subtitle }: { stages: IntakeStage[]; title: string; subtitle: string }) {
   return (
     <motion.div variants={fadeIn} initial="hidden" animate="visible" className="mx-auto max-w-md">

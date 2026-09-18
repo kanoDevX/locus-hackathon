@@ -38,7 +38,7 @@ public class GapAnalysisEngineTests
         var gaps = GapAnalysisEngine.AnalyzeGaps(record, threshold);
 
         gaps.Should().HaveCount(2);
-        gaps[0].SubjectName.Should().Be("Mathematics"); // 15 headroom vs Physics' 5
+        gaps[0].SubjectName.Should().Be("Mathematics");
         gaps[0].PriorityRank.Should().Be(1);
         gaps[1].SubjectName.Should().Be("Physics");
         gaps[1].PriorityRank.Should().Be(2);
@@ -69,7 +69,7 @@ public class GapAnalysisEngineTests
     [Fact]
     public void DocumentOnlyTrack_WithNoSubjectBreakdown_ReturnsNoGaps()
     {
-        var record = MakeRecord(totalScore: null); // ContinuingSpecialtyPaid-style record, no subjects
+        var record = MakeRecord(totalScore: null);
 
         var gaps = GapAnalysisEngine.AnalyzeGaps(record, threshold: null);
 

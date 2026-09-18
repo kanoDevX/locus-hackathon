@@ -7,13 +7,6 @@ import { useJourneyStore } from "@/lib/stores/journey-store";
 import { Link } from "@/i18n/navigation";
 import { slideInFromRight } from "@/lib/motion";
 
-/**
- * The core UX proof point (§5): whenever the backend's diff/delta comes back from a profile
- * update or a recommendation recalculation, surface it explicitly here instead of silently
- * re-rendering. The backend doesn't run a SignalR hub in this build (see README) — the diff is
- * delivered synchronously in the mutation response instead, which this panel renders the moment
- * that mutation resolves.
- */
 export function DiffPanel() {
   const t = useTranslations("diff");
   const { diffPanel, dismissDiffPanel } = useJourneyStore();

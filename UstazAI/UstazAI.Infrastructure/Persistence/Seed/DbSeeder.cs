@@ -5,8 +5,6 @@ using UstazAI.Domain.Enums;
 
 namespace UstazAI.Infrastructure.Persistence.Seed;
 
-/// <summary>Applies pending migrations and seeds the demo catalog + the judge account documented
-/// in the README ("test credentials if login required" per submission rules).</summary>
 public static class DbSeeder
 {
     public const string JudgeEmail = "judge@ustazai.demo";

@@ -43,16 +43,12 @@ export function RoadmapTaskCard({
   blockingTitles: string[];
   onToggleDone: () => void;
   isUpdating: boolean;
-  /** Opens the full-detail dialog (§ UX request: click a roadmap item for its complete info) —
-   * the card itself stays a compact summary. */
   onOpenDetail: () => void;
 }) {
   const t = useTranslations("roadmap");
   const Icon = CATEGORY_ICON[task.category];
   const isDone = task.status === "Done";
 
-  // useState's lazy initializer is the React-sanctioned place to read an impure value like
-  // Date.now() exactly once, keeping the render body itself pure across re-renders.
   const [now] = useState(() => Date.now());
   const daysUntilDue = task.dueDate ? Math.ceil((new Date(task.dueDate).getTime() - now) / (1000 * 60 * 60 * 24)) : null;
 

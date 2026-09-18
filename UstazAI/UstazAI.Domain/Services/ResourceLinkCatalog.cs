@@ -3,16 +3,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>
-/// Fixed, code-reviewed lookup of study resources per ENT/exam subject (§13). Deliberately not
-/// AI-generated — a link a student is told to click must never be something Gemini invented, so
-/// this is a plain static table, the same "code-controlled, not model-controlled" principle as
-/// PromptLibrary. Matching is keyword-based (case-insensitive substring) so seeded subject names
-/// like "Math Literacy" and a wizard-entered "Mathematics" both resolve sensibly. Every entry
-/// points at a real, stable top-level resource rather than a specific article/video URL that could
-/// go stale, and is marked DataProvenance.IsDemoData = true — this is an illustrative starter set
-/// for the hackathon, not a vetted, exhaustive curriculum.
-/// </summary>
 public static class ResourceLinkCatalog
 {
     private static readonly (string[] Keywords, List<ResourceLink> Links)[] Entries =

@@ -16,14 +16,6 @@ public sealed record SupplementaryExamInput(ExamType ExamType, decimal Score, de
 public sealed record CollegeBackgroundInput(
     string CollegeSpecialtyName, decimal? DiplomaAverageScore, int? GraduationYear, bool TargetSpecialtyMatchesCollegeSpecialty);
 
-/// <summary>
-/// Step 1-4 of the intake wizard (§12.1) in one mutation: EducationStage, the domestic exam
-/// record (always present — even ContinuingSpecialtyPaid and NotTakingEnt submit a nominal,
-/// score-less row so Track stays resolvable the same way for every path), optional college
-/// background, optional international/supplementary exams, and the funding-track preference. Bumps
-/// StudentProfile.Version and runs through the SAME ProfileDiffCalculator every other profile
-/// mutation uses — no second diff mechanism.
-/// </summary>
 public sealed record SubmitExamIntakeCommand(
     Guid ProfileId,
     Guid UserId,
@@ -38,9 +30,6 @@ public sealed record SubmitExamIntakeCommand(
 
 public sealed class SubmitExamIntakeValidator : AbstractValidator<SubmitExamIntakeCommand>
 {
-    // NotTakingEnt opts out of Kazakhstan's admission system entirely — it's compatible with
-    // either stage (a school *or* college student can be applying abroad only), so it's a member
-    // of both lists rather than tied to one.
     private static readonly AdmissionExamTrack[] SchoolTracks =
         [AdmissionExamTrack.StandardEnt, AdmissionExamTrack.CreativeExam, AdmissionExamTrack.NotTakingEnt];
     private static readonly AdmissionExamTrack[] CollegeTracks =
@@ -58,10 +47,6 @@ public sealed class SubmitExamIntakeValidator : AbstractValidator<SubmitExamInta
             exam.RuleFor(e => e.MaxScore).GreaterThan(0);
         });
 
-        // Cross-field branching logic (§12.1) — deliberately one Custom block rather than nested
-        // When()s: every rule here depends on at least two of {EducationStage, Track,
-        // CollegeBackground}, which reads far more clearly as one explicit decision tree than as
-        // scattered conditional rules.
         RuleFor(x => x).Custom((cmd, context) =>
         {
             var isCollegeStage = cmd.EducationStage is EducationStage.CollegeStudent or EducationStage.CollegeGraduate;
@@ -144,9 +129,6 @@ public sealed class SubmitExamIntakeHandler(IAppDbContext db) : IRequestHandler<
         var diff = BuildDiff(before, profile, changedFields);
         db.ProfileDiffs.Add(diff);
 
-        // Always insert a new row (re-takes are tracked, never overwritten) — even for
-        // ContinuingSpecialtyPaid, which carries no score, so Track is always resolvable from
-        // "the latest ExamRecord for this profile" regardless of which path the applicant is on.
         var examRecord = new ExamRecord
         {
             StudentProfileId = profile.Id,

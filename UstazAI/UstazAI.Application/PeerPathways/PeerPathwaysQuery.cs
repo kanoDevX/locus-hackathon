@@ -12,11 +12,6 @@ public sealed record PeerArchetypeGroupDto(
 
 public sealed record PeerPathwaysResultDto(int SampleSize, List<PeerArchetypeGroupDto> Groups, string Disclaimer);
 
-/// <summary>
-/// Peer Pathways (§5.4): instead of one point-estimate "62% chance", shows the anonymized
-/// distribution of similar seeded archetypes and how they typically fared — a materially more
-/// honest framing than a single chance-calculator number.
-/// </summary>
 public sealed class PeerPathwaysHandler(IAppDbContext db) : IRequestHandler<PeerPathwaysQuery, PeerPathwaysResultDto>
 {
     public async Task<PeerPathwaysResultDto> Handle(PeerPathwaysQuery query, CancellationToken ct)

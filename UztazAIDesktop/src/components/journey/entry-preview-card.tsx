@@ -3,9 +3,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, GraduationCap, Calendar } from "lucide-react";
 
-/** A tiny, honest preview of the output — never fake screenshots or stock photography, just a
- * softened, skeleton-flavored glimpse of a real roadmap card, so expectations are set correctly
- * before the survey begins (§4.1). */
 export function EntryPreviewCard() {
   return (
     <Card className="relative overflow-hidden">

@@ -15,8 +15,6 @@ public sealed record ExamIntakeRequestDto(
     List<SupplementaryExamInput> SupplementaryExams,
     FundingTrackPreference FundingTrackPreference);
 
-/// <summary>The new front door: intake -> calculate -> result (§12.4). Feeds directly into the
-/// existing Diagnostics/Recommendations pipeline (§5) once eligibility is known.</summary>
 public static class ExamIntakeEndpoints
 {
     public static void MapExamIntakeEndpoints(this IEndpointRouteBuilder app)

@@ -8,12 +8,6 @@ namespace UstazAI.Application.Calendar;
 
 public sealed record GetCalendarQuery(Guid ProfileId, Guid UserId) : IRequest<List<CalendarEntryDto>>;
 
-/// <summary>
-/// Aggregates every dated item relevant to the student — roadmap tasks and the application
-/// deadlines of programs they're actively tracking (via roadmap or favorites) — into one
-/// chronological calendar. Backs both the calendar view and the notifications feed (§ case
-/// brief's suggested "deadline calendar and reminders" baseline feature).
-/// </summary>
 public sealed class GetCalendarHandler(IAppDbContext db) : IRequestHandler<GetCalendarQuery, List<CalendarEntryDto>>
 {
     public async Task<List<CalendarEntryDto>> Handle(GetCalendarQuery query, CancellationToken ct)
@@ -47,9 +41,6 @@ public sealed class GetCalendarHandler(IAppDbContext db) : IRequestHandler<GetCa
 
 public sealed record GetNotificationsQuery(Guid ProfileId, Guid UserId, int WithinDays = 14) : IRequest<List<CalendarEntryDto>>;
 
-/// <summary>Reminders: the subset of the calendar landing within the next N days — a
-/// deterministic, always-on substitute for a push-notification service (see README "Known
-/// limitations" for why Hangfire/push wasn't built this round).</summary>
 public sealed class GetNotificationsHandler(ISender sender) : IRequestHandler<GetNotificationsQuery, List<CalendarEntryDto>>
 {
     public async Task<List<CalendarEntryDto>> Handle(GetNotificationsQuery query, CancellationToken ct)

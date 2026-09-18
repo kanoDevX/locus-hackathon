@@ -1,10 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { UncertaintyEstimateDto } from "@/lib/api/types";
 
-/** Never a bare "87% chance!" badge — always the range, sample size and basis (§ anti-pattern
- * "fake precision UI"). Reused as-is by the eligibility result screen (§12) for
- * GrantCompetitiveness — pass `label`/`sampleSizeLabel` to relabel it for a non-recommendation
- * context instead of forking a second band component. */
 export function UncertaintyBand({
   estimate,
   label,

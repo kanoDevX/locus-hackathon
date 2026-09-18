@@ -16,12 +16,6 @@ public sealed record WhatIfOptionDto(
     double OverallScoreDelta, double BaselineAdmissionProbability, double SimulatedAdmissionProbability,
     double AdmissionProbabilityDelta);
 
-/// <summary>
-/// Counterfactual simulator (§10.4): perturbs one realistic variable at a time against the
-/// deterministic hybrid scorer and ranks which single change would move the needle most. Pure
-/// computation, no AI call — cheap, fast, and the deterministic model is the same one the
-/// Recommendations stage already trusts.
-/// </summary>
 public sealed class WhatIfHandler(IAppDbContext db, DecisionLedgerWriter ledger) : IRequestHandler<WhatIfQuery, List<WhatIfOptionDto>>
 {
     public async Task<List<WhatIfOptionDto>> Handle(WhatIfQuery query, CancellationToken ct)

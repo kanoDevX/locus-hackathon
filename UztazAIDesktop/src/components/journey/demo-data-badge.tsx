@@ -9,11 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { ApiError } from "@/lib/api/client";
 import type { DataProvenanceDto } from "@/lib/api/types";
 
-/** Every place a number/deadline/requirement is shown, this makes unambiguous whether it's
- * verified or illustrative demo data — never presented as fabricated certainty. When the data is
- * demo data and the caller supplies `onVerify`, a "Check online" button appears next to it that
- * runs live, source-cited web research and replaces the demo figures (the badge then flips to
- * "Verified" with the cited sources in its tooltip). */
 export function DemoDataBadge({
   provenance,
   onVerify,

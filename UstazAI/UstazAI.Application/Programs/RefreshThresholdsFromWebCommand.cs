@@ -13,14 +13,6 @@ public sealed record RefreshThresholdsFromWebCommand(int ProgramId, AdmissionExa
 
 public sealed record RefreshThresholdsFromWebResult(List<string> UpdatedFields, List<string> SourceNames);
 
-/// <summary>
-/// Replaces seeded demo ENT/grant thresholds for one program+track with live, source-cited ones
-/// (Gemini + Google Search). Same honesty rules as RefreshProgramFromWebHandler: no cited source
-/// means no update; every score is bounds-checked (0-140) and the set must be self-consistent
-/// (state ≤ university threshold, min ≤ median ≤ max) or that group is skipped; anything not
-/// confirmed keeps its old value. The row is only marked verified for what was actually found.
-/// Callers should re-run POST /exam-intake/calculate afterwards — verdicts are snapshots.
-/// </summary>
 public sealed class RefreshThresholdsFromWebHandler(IAppDbContext db, IAiReasoningService ai, ICurrentUser user)
     : IRequestHandler<RefreshThresholdsFromWebCommand, RefreshThresholdsFromWebResult>
 {
@@ -64,7 +56,6 @@ public sealed class RefreshThresholdsFromWebHandler(IAppDbContext db, IAiReasoni
         if (state is { } s) { threshold.StateThreshold = s; updated.Add("stateThreshold"); }
         if (uni is { } u)
         {
-            // a program's own minimum can only be raised above the state floor, never lowered below it
             threshold.UniversityInternalThreshold = Math.Max(u, threshold.StateThreshold);
             updated.Add("universityThreshold");
         }

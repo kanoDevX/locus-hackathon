@@ -9,12 +9,6 @@ export interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputE
   hideLabel?: string;
 }
 
-/** A password <input> with a show/hide toggle — the universal modern-standard affordance so a
- * user can verify what they typed instead of blindly trusting masked dots (§ research: "Modern
- * Authentication" / form UX best practices). Toggle is type="button" so it never submits the
- * surrounding form, and the input keeps the correct `autocomplete` value passed in by the
- * caller (new-password vs current-password) rather than a blanket "off" that browsers ignore
- * anyway. */
 export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
   ({ className, showLabel = "Show password", hideLabel = "Hide password", ...props }, ref) => {
     const [visible, setVisible] = useState(false);

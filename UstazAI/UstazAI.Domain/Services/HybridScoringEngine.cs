@@ -4,12 +4,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>
-/// Deterministic, framework-free multi-factor scorer. This is the "not just a chatbot" core:
-/// a statistical model computes fit + admission probability first; the AI reasoning layer is
-/// only ever allowed to explain these already-computed numbers (see
-/// UstazAI.Application.Ai.IAiReasoningService), never to invent its own score.
-/// </summary>
 public static class HybridScoringEngine
 {
     private static readonly Dictionary<BudgetBand, decimal> BudgetCeilingUsd = new()
@@ -54,7 +48,7 @@ public static class HybridScoringEngine
                 .OrderByDescending(e => e.Score).FirstOrDefault();
             if (best is null)
             {
-                components.Add(40); // unknown — partial credit, flagged
+                components.Add(40);
                 notes.Add($"{req.ExamType} score not provided (required min {req.MinScore})");
             }
             else
@@ -77,8 +71,6 @@ public static class HybridScoringEngine
         var ceiling = assessment.BudgetCeilingUsd;
         var effectiveCost = assessment.EffectiveCostUsd;
 
-        // "Grant only" applicants aren't paying tuition out of a budget, so the budget band is
-        // meaningless for them — what matters is whether a grant/scholarship actually covers it.
         if (profile.FundingTrackPreference == FundingTrackPreference.GrantOnly)
         {
             var coverage = program.ScholarshipAvailable ? program.ScholarshipCoveragePercent : 0m;
@@ -114,15 +106,10 @@ public static class HybridScoringEngine
         return Math.Round(score, 1);
     }
 
-    /// <summary>Affordability & Fairness Audit (§10.6) — the single source of truth for "does this
-    /// program's real cost fit this applicant's budget", shared with ScoreFinancialFit above so
-    /// the 0-100 score and the disclosed tier can never silently disagree with each other.</summary>
     public static AffordabilityAssessment EvaluateAffordability(StudentProfile profile, ProgramOffering program)
     {
         if (profile.FundingTrackPreference == FundingTrackPreference.GrantOnly)
         {
-            // Tiers here mean grant coverage, not budget fit: covered / partly covered / not covered.
-            // EffectiveCostUsd is what remains out of pocket (uncovered tuition + living); no ceiling applies.
             var coverage = program.ScholarshipAvailable ? program.ScholarshipCoveragePercent : 0m;
             var outOfPocket = program.LivingCostPerYearUsd + program.TuitionPerYearUsd * (1 - coverage / 100m);
             var grantTier = program.TuitionPerYearUsd == 0m || coverage >= 100m
@@ -190,11 +177,6 @@ public static class HybridScoringEngine
         return (to.Year - from.Year) * 12 + (to.Month - from.Month);
     }
 
-    /// <summary>
-    /// Uncertainty-quantified admission probability (§10.3): never a bare percentage. Prefers
-    /// matched seeded archetypes; falls back to the program's own base rate, adjusted by
-    /// academic fit, with an explicitly widened interval when the peer sample is thin.
-    /// </summary>
     private static UncertaintyEstimate EstimateAdmissionProbability(
         StudentProfile profile, ProgramOffering program, IReadOnlyList<AdmitArchetype> archetypes, double academicScore)
     {

@@ -15,8 +15,6 @@ interface State {
   hasError: boolean;
 }
 
-/** Wraps the journey shell so a runtime error anywhere below it never shows a raw stack trace or
- * a blank white screen during the live demo (§7 reliability). */
 export class ErrorBoundary extends React.Component<Props, State> {
   state: State = { hasError: false };
 

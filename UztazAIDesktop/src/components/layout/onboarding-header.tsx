@@ -11,14 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { LogOut } from "lucide-react";
 
-/**
- * Focus-mode header shown only on the intake wizard (§ UX request: no other functionality must
- * be reachable while the required first-run survey is in progress). Deliberately omits the
- * command palette, the journey stepper and every secondary-feature link that the full
- * `AppHeader` exposes — the only way out is finishing the wizard or signing out. The step
- * indicator lives here (top-center, always visible) instead of inside the wizard card, so it
- * reads like a native OS/App-Store-style setup flow rather than a form embedded in a page.
- */
 export function OnboardingHeader() {
   const tCommon = useTranslations("common");
   const tNav = useTranslations("nav");

@@ -14,14 +14,6 @@ import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import { AccountSettingsDialog } from "@/components/journey/account-settings-dialog";
 
-/**
- * Deliberately minimal now that /journey/home exists as the actual navigation hub (§ UX request:
- * the old always-visible 7-step stepper cluttered the main menu — it implied a fixed linear order
- * that no longer matches how the app works once intake is done). The command palette trigger
- * lives in a floating bottom-right button (CommandPaletteFab) instead of a header button, and the
- * "···" secondary-links dropdown was removed outright — every link it held already has its own
- * card on the home dashboard, so keeping both was two competing paths to the same place.
- */
 export function AppHeader() {
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
@@ -41,8 +33,6 @@ export function AppHeader() {
     try {
       await demoReset.mutateAsync();
       toast.success(tReset("confirm"));
-      // The scripted demo profile already has a completed intake (see DemoResetCommand), so a
-      // judge lands straight on the hub rather than being routed through the wizard again.
       router.push("/journey/home");
     } catch {
       toast.error(tCommon("errorTitle"));

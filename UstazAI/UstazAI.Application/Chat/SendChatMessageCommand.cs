@@ -25,14 +25,6 @@ public sealed class SendChatMessageValidator : AbstractValidator<SendChatMessage
     }
 }
 
-/// <summary>
-/// Result-aware AI chat (§13): every reply is grounded in the caller's own already-computed
-/// eligibility verdicts, diagnostics and gap analysis — never a general-purpose open chat. The
-/// scoped context is built here from real persisted data and handed to Gemini as read-only JSON
-/// it may narrate but not contradict; on any AI failure a deterministic fallback restates the same
-/// underlying numbers instead of going blank, the same graceful-degradation pattern as every other
-/// AI-backed feature in the product.
-/// </summary>
 public sealed class SendChatMessageHandler(IAppDbContext db, IAiReasoningService ai, DecisionLedgerWriter ledger, ICurrentUser user, ILogger<SendChatMessageHandler> logger)
     : IRequestHandler<SendChatMessageCommand, ChatMessageDto>
 {
@@ -50,8 +42,6 @@ public sealed class SendChatMessageHandler(IAppDbContext db, IAiReasoningService
             .ToListAsync(ct);
         history.Reverse();
 
-        // GrantCompetitiveness is a JSON-converted complex property — not SQL-sortable — so the
-        // ranking happens client-side after materialization (same fix as GetEligibilityResultQuery).
         var topEligibility = (await db.EligibilityResults
             .Include(r => r.Program)
             .Where(r => r.StudentProfileId == profile.Id && r.ProfileVersion == profile.Version)
@@ -87,9 +77,6 @@ public sealed class SendChatMessageHandler(IAppDbContext db, IAiReasoningService
             fallbackUsed = true;
         }
 
-        // Sanitized before persisting so the stored row and the returned DTO can never disagree —
-        // GuardrailBehavior's SanitizeAiText on the response is a redundant last-resort net on top
-        // of this, not the only line of defense (§5.3).
         reply = GuardrailRules.Sanitize(reply);
 
         var assistantMessage = new ChatMessage

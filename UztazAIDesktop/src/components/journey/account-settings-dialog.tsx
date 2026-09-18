@@ -18,12 +18,6 @@ import { PasswordField } from "@/components/journey/password-field";
 import { FormField } from "@/components/journey/form-field";
 import { passwordStrength } from "@/lib/validation/auth-schema";
 
-/**
- * Account editing (§ UX request: "click to edit your account, think through how it should
- * look"). Two tabs rather than one long form — profile info and password are different-weight
- * actions (one is instant, the other ends every session including this one), so they get
- * separate save buttons and separate blast radius instead of one combined submit.
- */
 export function AccountSettingsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const t = useTranslations("account");
   const tValidation = useTranslations("validation");
@@ -43,8 +37,6 @@ export function AccountSettingsDialog({ open, onOpenChange }: { open: boolean; o
     defaultValues: { currentPassword: "", newPassword: "", confirmNewPassword: "" },
   });
 
-  // Reset the password tab's fields every time the dialog is reopened, so a previous attempt's
-  // (deliberately sensitive) input never lingers in memory or on screen longer than needed.
   useEffect(() => {
     if (open) passwordForm.reset({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -11,11 +11,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers the full-screen study guide (§ UX request): generating a step-by-step plan
-/// for a SubjectPrep roadmap task, persisting it so a second GET returns the same content rather
-/// than regenerating, and confirming every step's "video" is a real YouTube search link built
-/// from a search phrase — never a specific fabricated video (no video-metadata API is wired up,
-/// see StudyGuideStep's own doc comment on the Domain side).</summary>
 public sealed class StudyGuideIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, Guid ProfileId, int TaskId)> SetupWithPrepTaskAsync()
@@ -65,8 +60,6 @@ public sealed class StudyGuideIntegrationTests(UstazApiFactory factory) : IClass
         guide.Steps.Select(s => s.StepNumber).Should().BeInAscendingOrder();
         guide.Steps.Should().OnlyContain(s => s.YouTubeSearchUrl.StartsWith("https://www.youtube.com/results?search_query="),
             "every step must link to a real YouTube search, never a specific invented video");
-        // No Gemini key is configured for the test host, so this must be the deterministic
-        // fallback — proving the feature degrades gracefully instead of failing outright.
         guide.FallbackUsed.Should().BeTrue();
     }
 

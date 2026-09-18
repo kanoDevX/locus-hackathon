@@ -14,8 +14,6 @@ public static class AuthEndpoints
     {
         var group = app.MapGroup("/api/v1/auth").WithTags("Auth");
 
-        // Credential-guessing surface — rate limited per IP (§ OWASP ASVS baseline), unlike
-        // logout/logout-all below which don't help an attacker guess anything.
         group.MapPost("/register", async (RegisterCommand cmd, ISender sender, CancellationToken ct) =>
             Results.Ok(await sender.Send(cmd, ct)))
             .RequireRateLimiting("auth");

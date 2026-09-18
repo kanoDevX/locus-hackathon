@@ -7,9 +7,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers account editing (§ UX request: "click to edit your account") — updating
-/// display name/email, and changing the password (which must revoke every existing session,
-/// same as LogoutAllCommand, so a stolen old session can't survive a credential change).</summary>
 public sealed class AccountIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, string Email)> RegisterAsync()
@@ -65,11 +62,9 @@ public sealed class AccountIntegrationTests(UstazApiFactory factory) : IClassFix
         var changeResponse = await client.PostAsJsonAsync("/api/v1/auth/change-password", new ChangePasswordRequestDto("TestPassword123!", "NewPassword123!"));
         changeResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // The old password no longer works…
         var oldLoginAttempt = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new LoginCommand(email, "TestPassword123!"));
         oldLoginAttempt.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-        // …but the new one does.
         var newLoginAttempt = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new LoginCommand(email, "NewPassword123!"));
         newLoginAttempt.StatusCode.Should().Be(HttpStatusCode.OK);
     }

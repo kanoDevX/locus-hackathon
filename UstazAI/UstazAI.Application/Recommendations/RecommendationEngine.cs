@@ -10,11 +10,6 @@ using UstazAI.Domain.Services;
 
 namespace UstazAI.Application.Recommendations;
 
-/// <summary>
-/// Orchestrates the hybrid scorer (§5.1) against the full catalog and, best-effort, asks Gemini
-/// to narrate the top results. Always produces a usable recommendation batch even if every
-/// Gemini call fails — narration falls back to the scorer's own deterministic notes.
-/// </summary>
 public sealed class RecommendationEngine(
     IAppDbContext db, IAiReasoningService ai, DecisionLedgerWriter ledger, ICurrentUser user, ILogger<RecommendationEngine> logger)
 {
@@ -33,18 +28,8 @@ public sealed class RecommendationEngine(
             .Take(MaxResults)
             .ToList();
 
-        // Narration calls are independent per program — fired concurrently rather than awaited
-        // one at a time in the loop, since a sequential await here means the user waits N times
-        // Gemini's real-world latency (each call already showed ~10-14s live) for what could be a
-        // single round-trip's worth of wall-clock time.
         var narrations = await Task.WhenAll(scored.Select(x => SafeNarrateAsync(x.Program, x.Result, user.UiLocale ?? profile.PreferredLanguage, ct)));
 
-        // A repeat call at the same profile version (page refresh, double-click, a retried
-        // request — nothing here bumps Version) must replace that version's batch, not append a
-        // second one alongside it: GetLatestRecommendationsQuery filters strictly on
-        // ProfileVersion == profile.Version with no de-duplication, so leftover rows from an
-        // earlier call at this same version would double up every RankPosition and silently skew
-        // the delta this method's own caller computes against the *previous* version.
         var staleAtThisVersion = await db.Recommendations
             .Where(r => r.StudentProfileId == profile.Id && r.ProfileVersion == profile.Version)
             .ToListAsync(ct);

@@ -13,15 +13,6 @@ public sealed record RefreshProgramFromWebCommand(int ProgramId) : IRequest<Refr
 public sealed record RefreshProgramFromWebResult(
     ProgramSummaryDto Program, DataProvenanceDto Provenance, List<string> UpdatedFields, List<string> SourceUrls);
 
-/// <summary>
-/// Replaces seeded demo figures with live, source-cited ones: Gemini + Google Search researches
-/// the program, and the result is saved on the catalog row so every later read reuses it without
-/// another AI call. Honest by construction — sources come from Gemini's grounding metadata (no
-/// source means no update), each field is sanity-bounded and only applied if it passes, anything
-/// the model couldn't confirm stays as it was, and provenance names the cited pages while telling
-/// the student to verify on the official site. Fields it didn't update keep their old values, so
-/// the row is marked verified only for what was actually researched.
-/// </summary>
 public sealed class RefreshProgramFromWebHandler(IAppDbContext db, IAiReasoningService ai, ICurrentUser user)
     : IRequestHandler<RefreshProgramFromWebCommand, RefreshProgramFromWebResult>
 {

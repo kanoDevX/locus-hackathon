@@ -14,8 +14,6 @@ public static class ProgramsEndpoints
             Results.Ok(await sender.Send(new SearchProgramsQuery(query, country, field, degreeLevel, maxTuition, scholarshipOnly), ct)))
             .WithTags("Programs").RequireAuthorization();
 
-        // Live, source-cited refresh of one catalog program (Gemini + Google Search) — saved on the
-        // row, so later reads reuse it with no further AI call.
         app.MapPost("/api/v1/programs/{programId:int}/refresh-from-web", async (int programId, ISender sender, CancellationToken ct) =>
             Results.Ok(await sender.Send(new RefreshProgramFromWebCommand(programId), ct)))
             .WithTags("Programs").RequireAuthorization().RequireRateLimiting("ai");

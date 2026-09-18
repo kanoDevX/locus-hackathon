@@ -9,14 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeInUp } from "@/lib/motion";
 
-/**
- * Judge-facing "engineering maturity" dashboard (§2/§6) — surfaces real numbers pulled from the
- * AiUsageLog table (every Gemini call this environment has ever made: latency, success/fallback
- * rate, token spend) rather than asserting "the product is fast and reliable" with nothing behind
- * it. The backend endpoint (`GET /system/insights`) existed with exactly this purpose documented
- * in its own doc comment but had no frontend page at all until this one — the numbers were real
- * but literally unreachable by anyone without Swagger/curl.
- */
 export default function InsightsPage() {
   const t = useTranslations("insights");
   const { data, isLoading } = useInsights();

@@ -4,16 +4,6 @@ using UstazAI.Domain.ValueObjects;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>
-/// Deterministic, framework-free eligibility engine modeling Kazakhstan's real three-tier
-/// admission-scoring system (state threshold / university internal threshold / competitive grant
-/// cutoff) plus the parallel, non-competitive paid track. Dispatches strictly on
-/// <see cref="ExamRecord.Track"/> — this explicit switch is the core of what makes the engine
-/// domain-accurate rather than a generic "score vs. cutoff" comparator, and is guarded by a unit
-/// test per branch (see GrantEligibilityEngineTests). Never invents a confident-looking cutoff:
-/// every number traces back to a seeded <see cref="AdmissionThreshold"/> row, and a missing
-/// threshold produces an honestly-flagged low-confidence verdict rather than a fabricated one.
-/// </summary>
 public static class GrantEligibilityEngine
 {
     public static EligibilityVerdict Evaluate(ExamRecord examRecord, AdmissionThreshold? threshold) =>
@@ -31,11 +21,6 @@ public static class GrantEligibilityEngine
             AdmissionExamTrack.ContinuingSpecialtyGrant =>
                 ScoreBasedVerdict(examRecord, threshold, "Continuing specialty, reduced exam, grant track"),
 
-            // No exam at all on this path — direct admission via the university's own commission.
-            // Short-circuits before any threshold lookup; a score-based verdict would be
-            // meaningless here and answering "true/false" on a state/university threshold that
-            // doesn't apply to this path would misrepresent how this applicant is actually
-            // admitted.
             AdmissionExamTrack.ContinuingSpecialtyPaid => DocumentOnlyVerdict(),
 
             _ => throw new ArgumentOutOfRangeException(nameof(examRecord), examRecord.Track, "Unhandled admission exam track.")
@@ -65,9 +50,6 @@ public static class GrantEligibilityEngine
         var meetsState = score >= threshold.StateThreshold;
         var meetsUniversity = score >= threshold.UniversityInternalThreshold;
 
-        // Paid admission never competes against the grant cutoff — it only needs to clear the
-        // program's own (lower) minimum. A student below the competitive cutoff can still enroll
-        // on a paid basis if they clear this bar.
         var paidEligible = meetsUniversity;
 
         var competitiveness = EstimateGrantCompetitiveness(score, threshold);
@@ -81,9 +63,6 @@ public static class GrantEligibilityEngine
         return new EligibilityVerdict(meetsState, meetsUniversity, competitiveness, paidEligible, IsDocumentOnlyVerdict: false, notes);
     }
 
-    /// <summary>Historical cutoff is modeled as a seeded range, never a single deterministic
-    /// number (§2) — position within that range maps to a 10-90 point estimate, widened by
-    /// sample size exactly like HybridScoringEngine's admission-probability estimate.</summary>
     private static UncertaintyEstimate EstimateGrantCompetitiveness(decimal score, AdmissionThreshold threshold)
     {
         if (threshold.HistoricalCutoffSampleSize <= 0)
@@ -121,9 +100,6 @@ public static class GrantEligibilityEngine
     }
 
     private static EligibilityVerdict DocumentOnlyVerdict() => new(
-        // Deliberately true/true rather than false/false: these two flags don't apply to this
-        // path at all, and defaulting them to "not blocked" avoids a caller that ignores
-        // IsDocumentOnlyVerdict misreading this as a failed eligibility check.
         MeetsStateThreshold: true,
         MeetsUniversityThreshold: true,
         GrantCompetitiveness: new UncertaintyEstimate

@@ -5,11 +5,6 @@ using UstazAI.Domain.Entities;
 
 namespace UstazAI.Application.CampusMap;
 
-/// <summary>
-/// Single shared builder for a program's campus-map view (§14) — used by both the standalone
-/// GetCampusMapQuery and the Comparison feature's per-row map data, so there is exactly one place
-/// that turns a University's Coordinates/Environment into the API shape, never two forked copies.
-/// </summary>
 public static class CampusMapBuilder
 {
     public static CampusMapDto Build(ProgramOffering program, IMapProvider mapProvider)

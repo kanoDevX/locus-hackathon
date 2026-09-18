@@ -10,10 +10,6 @@ namespace UstazAI.Application.NextAction;
 
 public sealed record NextActionQuery(Guid ProfileId, Guid UserId) : IRequest<RoadmapTaskDto?>;
 
-/// <summary>
-/// Exactly one prioritized task (§4 stage 7): urgency x impact, boosted the closer the due date
-/// gets, and never a task whose prerequisites are still incomplete.
-/// </summary>
 public sealed class NextActionHandler(IAppDbContext db) : IRequestHandler<NextActionQuery, RoadmapTaskDto?>
 {
     public async Task<RoadmapTaskDto?> Handle(NextActionQuery query, CancellationToken ct)

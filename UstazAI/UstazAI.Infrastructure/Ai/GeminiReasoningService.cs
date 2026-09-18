@@ -11,29 +11,14 @@ using UstazAI.Domain.Enums;
 
 namespace UstazAI.Infrastructure.Ai;
 
-/// <summary>
-/// Gemini implementation of the AI reasoning port. Every call uses controlled generation
-/// (responseSchema, never free-text regex parsing) and every call is logged to AiUsageLog for
-/// the /system/insights endpoint. Resilience (retry/timeout/circuit-breaker) is applied to the
-/// injected HttpClient via Microsoft.Extensions.Http.Resilience in DI registration — this class
-/// simply lets failures propagate so Application-layer callers can fall back deterministically.
-/// </summary>
 public sealed class GeminiReasoningService(
     HttpClient http, IOptions<GeminiOptions> optionsAccessor, IAppDbContext db, ICurrentUser currentUser, ILogger<GeminiReasoningService> logger)
     : IAiReasoningService
 {
     private readonly GeminiOptions _options = optionsAccessor.Value;
 
-    // UI language (X-Locale) beats the profile's stored language for every generated text.
     private Locale L(Locale profileLocale) => currentUser.UiLocale ?? profileLocale;
 
-    // EF Core's DbContext is not thread-safe for concurrent operations on the same instance.
-    // RecommendationEngine now fires several narration calls concurrently (Task.WhenAll) through
-    // this same scoped instance — the HTTP round-trip below is safe to run in parallel (HttpClient
-    // supports concurrent requests), but the AiUsageLog write in the finally block shares this
-    // request's single DbContext, so only that section is serialized. This keeps the actual
-    // network latency parallelized while avoiding "a second operation was started on this
-    // context before a previous operation completed."
     private readonly SemaphoreSlim _dbLock = new(1, 1);
 
     public async Task<DiagnosticsAiOutput> GenerateDiagnosticsAsync(DiagnosticsAiInput input, CancellationToken ct)
@@ -235,15 +220,8 @@ public sealed class GeminiReasoningService(
         return new PersonaClassificationOutput(tone, false);
     }
 
-    // Models whose per-model daily quota answered 429 recently -> when we may try them again.
-    // Free-tier keys allow only ~20 requests/day on gemini-3.5-flash; without this every request
-    // would first burn a round-trip (and a log full of stack traces) on a model known to be spent.
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> ExhaustedUntil = new();
 
-    /// <summary>Tries the primary model, then each fallback model in turn when one answers 429
-    /// (quota exhausted): quotas are per model, so a spent gemini-3.5-flash doesn't take the whole
-    /// product down while gemini-2.5-flash / flash-lite still have budget. Every attempt is
-    /// logged to AiUsageLog under the model that actually served it.</summary>
     private async Task<JsonNode> CallAsync(
         string model, string systemInstruction, string userContent, JsonNode schema, string module, CancellationToken ct)
     {
@@ -258,7 +236,6 @@ public sealed class GeminiReasoningService(
             }
             catch (HttpRequestException ex) when (ex.StatusCode is System.Net.HttpStatusCode.TooManyRequests or System.Net.HttpStatusCode.ServiceUnavailable or System.Net.HttpStatusCode.GatewayTimeout)
             {
-                // 429 = this model's free quota is spent (long cooldown); 503/504 = it is overloaded right now (short one).
                 ExhaustedUntil[candidate] = DateTime.UtcNow.AddMinutes(ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests ? 10 : 1);
                 logger.LogWarning("Model {Model} unavailable ({Status}); trying next model for {Module}", candidate, (int?)ex.StatusCode, module);
                 last = ex;
@@ -288,8 +265,6 @@ public sealed class GeminiReasoningService(
                 ["generationConfig"] = new JsonObject { ["responseMimeType"] = "application/json", ["responseSchema"] = schema }
             };
 
-            // Key goes in a header, not the query string: Microsoft.Extensions.Http's logging
-            // handler writes the full request URI to the log, which leaked the key into log files.
             var url = $"{_options.BaseUrl}/models/{model}:generateContent";
 
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
@@ -334,16 +309,6 @@ public sealed class GeminiReasoningService(
                     OutputTokens = outputTokens,
                     LatencyMs = sw.ElapsedMilliseconds,
                     Success = success,
-                    // CallAsync re-throws on any failure (see the catch block above) rather than
-                    // swallowing it — every single public method on this class, and every
-                    // Application-layer caller of them, catches that exception and substitutes a
-                    // deterministic fallback (§ "graceful AI degradation" — confirmed with no
-                    // exception across RecommendationEngine, GenerateDiagnosticsCommand,
-                    // SendChatMessageCommand, GenerateStudyGuideCommand, essay review). A failed
-                    // raw call and "a fallback will be used" are the same event at this call site,
-                    // so hardcoding this to false (as it was before) made the insights dashboard's
-                    // fallback-rate stat permanently 0% regardless of how often Gemini actually
-                    // failed — the one number that exists specifically to show that honestly.
                     FallbackUsed = !success,
                     ErrorMessage = errorMessage
                 });
@@ -363,8 +328,6 @@ public sealed class GeminiReasoningService(
              "DEADLINE: <YYYY-MM-DD or unknown>", "SCHOLARSHIP_AVAILABLE: <yes|no|unknown>"],
             "ProgramWebResearch", ct);
 
-        // Scholarship *coverage* is deliberately not taken from the web: pages describe waivers
-        // for specific groups (e.g. "up to 100%"), which would misstate a general figure.
         return new ProgramResearchOutput(
             Number(Field(text, "TUITION_USD_PER_YEAR")), Number(Field(text, "LIVING_USD_PER_YEAR")),
             DateOnly.TryParse(Field(text, "DEADLINE"), out var dl) ? dl : null,
@@ -395,7 +358,6 @@ public sealed class GeminiReasoningService(
         return m.Success && !m.Groups[1].Value.StartsWith("unknown", StringComparison.OrdinalIgnoreCase) ? m.Groups[1].Value : null;
     }
 
-    // "16848-25920" (a range) -> midpoint; plain numbers as-is; anything else -> null.
     private static decimal? Number(string? raw)
     {
         if (raw is null) return null;
@@ -404,11 +366,6 @@ public sealed class GeminiReasoningService(
         return nums.Count == 0 ? null : nums.Average();
     }
 
-    /// <summary>One Google-Search-grounded Gemini call (on the dedicated ResearchModel, so it draws
-    /// on its own quota). Google only attaches citations (groundingChunks) to a plain-text answer —
-    /// a JSON-only reply comes back searched but uncited — so the answer is requested as labelled
-    /// lines. Sources come from groundingMetadata (what Gemini actually read), never from
-    /// model-written text. Logged to AiUsageLog under <paramref name="module"/>.</summary>
     private async Task<(string Text, List<ProgramResearchSource> Sources)> GroundedTextAsync(
         string context, string[] lines, string module, CancellationToken ct)
     {
@@ -435,7 +392,6 @@ public sealed class GeminiReasoningService(
                 ["tools"] = new JsonArray(new JsonObject { ["google_search"] = new JsonObject() })
             };
 
-            // Free-tier quotas are per model: on 429 walk down the chain instead of failing.
             HttpResponseMessage? httpResponse = null;
             var keys = new[] { _options.ApiKey }.Concat(_options.ExtraApiKeys).Where(k => !string.IsNullOrWhiteSpace(k)).Distinct().ToList();
             foreach (var (key, m) in keys.SelectMany(k => new[] { _options.ResearchModel }.Concat(_options.FallbackModels).Append(_options.FlashModel).Distinct().Select(m => (k, m))))

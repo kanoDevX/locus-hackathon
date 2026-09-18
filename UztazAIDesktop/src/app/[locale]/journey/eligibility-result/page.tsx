@@ -14,13 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { fadeInUp } from "@/lib/motion";
 
-/**
- * §12 result screen: the exam-intake wizard hands off here immediately after submitting, this
- * page triggers the (deterministic, synchronous) eligibility calculation, shows the real staged
- * progress while it runs, then reveals the dual grant/paid verdict per program. From here the
- * student continues into the existing journey (Diagnostics is the next mandatory stage) rather
- * than a separate "home dashboard" screen this codebase doesn't otherwise have.
- */
 export default function EligibilityResultPage() {
   const t = useTranslations("eligibility");
   const router = useRouter();

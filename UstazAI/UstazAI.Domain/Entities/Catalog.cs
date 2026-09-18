@@ -12,8 +12,6 @@ public sealed class University : AuditableEntity<int>
     public string? WebsiteUrl { get; set; }
     public DataProvenance Provenance { get; set; } = DataProvenance.Demo("UstazAI seed dataset");
 
-    /// <summary>Nullable — only seeded for universities the map view actually covers (§14); a
-    /// missing value means "not yet mapped," never a fabricated (0,0) coordinate.</summary>
     public GeoCoordinates? Coordinates { get; set; }
     public EnvironmentProfile? Environment { get; set; }
 
@@ -48,9 +46,6 @@ public sealed class ProgramOffering : AuditableEntity<int>
     public List<AdmitArchetype> AdmitArchetypes { get; set; } = [];
     public List<Scholarship> Scholarships { get; set; } = [];
 
-    /// <summary>Present only for domestic (Kazakhstan) programs that accept ENT-family
-    /// applicants — one row per <see cref="Enums.AdmissionExamTrack"/> the program actually
-    /// accepts. Absent for foreign programs, which don't participate in this system at all.</summary>
     public List<AdmissionThreshold> AdmissionThresholds { get; set; } = [];
 }
 
@@ -64,10 +59,6 @@ public sealed class Scholarship : AuditableEntity<int>
     public DataProvenance Provenance { get; set; } = DataProvenance.Demo("UstazAI seed dataset");
 }
 
-/// <summary>
-/// Synthetic/anonymized historical admit record used both by the hybrid scorer (§5.1) and by
-/// the Peer Pathways endpoint (§5.4). Never a real applicant — always seeded/illustrative.
-/// </summary>
 public sealed class AdmitArchetype : AuditableEntity<int>
 {
     public int ProgramId { get; set; }

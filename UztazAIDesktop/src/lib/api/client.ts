@@ -44,7 +44,6 @@ interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
   body?: unknown;
   query?: Record<string, string | number | boolean | undefined | null>;
-  /** Skip attaching the Authorization header (login/register/onboarding). */
   anonymous?: boolean;
 }
 
@@ -64,7 +63,6 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
 
   const doFetch = async () => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    // The UI language wins over the profile's stored language for AI-generated text.
     if (typeof window !== "undefined") {
       const uiLocale = window.location.pathname.split("/")[1];
       if (["ru", "kk", "en"].includes(uiLocale)) headers["X-Locale"] = uiLocale;
@@ -109,10 +107,6 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
 
   if (response.status === 204) return undefined as T;
 
-  // Some endpoints (e.g. GET /profile/mine when the account has no profile yet) legitimately
-  // return 200 with a genuinely empty body rather than the literal JSON text "null" — minimal
-  // API's `Results.Ok(null)` serializes that way. `response.json()` throws a SyntaxError on empty
-  // input, so read as text first and only parse when there's actually something to parse.
   const text = await response.text();
   if (text.length === 0) return undefined as T;
   return JSON.parse(text) as T;

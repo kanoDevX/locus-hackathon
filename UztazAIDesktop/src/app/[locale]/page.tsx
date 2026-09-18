@@ -12,11 +12,6 @@ export default async function EntryPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
   const t = await getTranslations("entry");
   const common = await getTranslations("common");
-  // The case brief's own journey table (§4) names this the "Entry" stage with its own endpoint —
-  // fetched server-side (this is already an async Server Component) rather than hardcoded, so the
-  // landing page reflects the same source of truth Judge Sandbox / API docs do. Falls back to the
-  // static translation strings below if the API is unreachable — a public marketing page must
-  // never hard-fail because a backend call didn't come back.
   const valueProp = await getValueProposition(locale);
 
   return (

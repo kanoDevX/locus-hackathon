@@ -7,9 +7,6 @@ using UstazAI.Domain.Services;
 
 namespace UstazAI.Application.Common.Services;
 
-/// <summary>Appends one hash-chained row to the AiDecisionLog ledger (§10.9). Does not call
-/// SaveChanges — the caller's unit of work (the MediatR handler) commits it alongside its own
-/// changes so the decision record and the data it describes are persisted atomically.</summary>
 public sealed class DecisionLedgerWriter(IAppDbContext db)
 {
     public async Task AppendAsync(Guid profileId, AiDecisionType type, object payload, CancellationToken ct)

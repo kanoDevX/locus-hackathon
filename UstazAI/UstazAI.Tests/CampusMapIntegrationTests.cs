@@ -11,9 +11,6 @@ using UstazAI.Endpoints;
 
 namespace UstazAI.Tests;
 
-/// <summary>Covers §14: campus map/environment data for a mapped university, honest nulls for an
-/// unmapped one, and the Comparison-feature integration (never a disconnected standalone
-/// screen).</summary>
 public sealed class CampusMapIntegrationTests(UstazApiFactory factory) : IClassFixture<UstazApiFactory>
 {
     private async Task<(HttpClient Client, Guid ProfileId)> SetupAsync()
@@ -45,7 +42,7 @@ public sealed class CampusMapIntegrationTests(UstazApiFactory factory) : IClassF
     public async Task MappedUniversity_ReturnsCoordinatesEnvironmentAndTwoGisLink()
     {
         var (client, profileId) = await SetupAsync();
-        var programId = await FindProgramIdAsync(client, "Kazakhstan", "Computer Science"); // Nazarbayev University — seeded with map data
+        var programId = await FindProgramIdAsync(client, "Kazakhstan", "Computer Science");
 
         var response = await client.GetAsync($"/api/v1/profile/{profileId}/campus-map/{programId}");
 
@@ -61,7 +58,7 @@ public sealed class CampusMapIntegrationTests(UstazApiFactory factory) : IClassF
     public async Task UnmappedUniversity_ReturnsHonestNulls_NeverFabricatedCoordinates()
     {
         var (client, profileId) = await SetupAsync();
-        var programId = await FindProgramIdAsync(client, "Russia", "Applied Mathematics"); // Novosibirsk State University — not seeded with map data
+        var programId = await FindProgramIdAsync(client, "Russia", "Applied Mathematics");
 
         var response = await client.GetAsync($"/api/v1/profile/{profileId}/campus-map/{programId}");
 

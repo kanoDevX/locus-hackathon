@@ -2,9 +2,6 @@ using FluentValidation;
 
 namespace UstazAI.Middleware;
 
-/// <summary>Global exception handler — first in the pipeline (§3). Translates known exception
-/// types into problem-details responses instead of leaking stack traces to judges poking the
-/// API directly through Swagger.</summary>
 public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)

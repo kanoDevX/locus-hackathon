@@ -2,11 +2,6 @@ using UstazAI.Domain.Entities;
 
 namespace UstazAI.Domain.Services;
 
-/// <summary>
-/// Pure field-level comparer at the heart of the Explainable Diff Engine (§5.2). Application
-/// layer wraps this with persistence + recommendation re-scoring + SignalR push; this class only
-/// answers "what changed" in a way a human can read.
-/// </summary>
 public static class ProfileDiffCalculator
 {
     public static List<string> DetectChangedFields(StudentProfile before, StudentProfile after)
