@@ -9,8 +9,8 @@ UstazAI превращает профиль и цель абитуриента �
 
 | | |
 |---|---|
-| Рабочий сайт | `<ССЫЛКА-НА-FRONTEND>` |
-| API | `<ССЫЛКА-НА-BACKEND>/scalar` |
+| Рабочий сайт | https://locus-ustazai.vercel.app |
+| API | `https://ustazai-api.onrender.com` (проверка: `/health`) |
 | Тестовый вход | `judge@ustazai.demo` / `JudgePass123!` (или зарегистрируйте свой аккаунт) |
 | Демо-видео | `<ССЫЛКА>` |
 
@@ -146,9 +146,10 @@ TanStack Query, Zustand, react-hook-form, zod, next-intl, sonner, Leaflet. Ди�
 
 ## Команда и роли
 
-> Заполните: участники и их роли (например: продукт и UX, frontend, backend, AI/данные).
+Команда **ctrl+win**, 2 человека:
 
-- `<Имя>`: `<роль>`
+- **Ибрахим**: Product & Engineering (архитектура, backend, frontend, AI-интеграция).
+- **Мейржан**: Design & Communication (дизайн, презентация, коммуникация).
 
 ## Развитие
 
