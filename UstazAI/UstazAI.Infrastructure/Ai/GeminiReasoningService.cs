@@ -234,7 +234,7 @@ public sealed class GeminiReasoningService(
             {
                 return await CallOnceAsync(candidate, systemInstruction, userContent, schema.DeepClone(), module, ct);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode is System.Net.HttpStatusCode.TooManyRequests or System.Net.HttpStatusCode.ServiceUnavailable or System.Net.HttpStatusCode.GatewayTimeout)
+            catch (HttpRequestException ex) when (ex.StatusCode is System.Net.HttpStatusCode.TooManyRequests or System.Net.HttpStatusCode.ServiceUnavailable or System.Net.HttpStatusCode.GatewayTimeout or System.Net.HttpStatusCode.NotFound)
             {
                 ExhaustedUntil[candidate] = DateTime.UtcNow.AddMinutes(ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests ? 10 : 1);
                 logger.LogWarning("Model {Model} unavailable ({Status}); trying next model for {Module}", candidate, (int?)ex.StatusCode, module);
@@ -335,6 +335,33 @@ public sealed class GeminiReasoningService(
             null, sources);
     }
 
+    public async Task<ScholarshipDiscoveryOutput> DiscoverScholarshipsAsync(ScholarshipDiscoveryInput input, CancellationToken ct)
+    {
+        var language = PromptLibrary.LocaleName(currentUser.UiLocale ?? Locale.En);
+        var (text, sources) = await GroundedTextAsync(
+            $"Find scholarships, tuition waivers and grants that {input.UniversityName} ({input.Country}) itself offers or administers for " +
+            $"{(string.IsNullOrWhiteSpace(input.DegreeLevel) ? "bachelor's" : input.DegreeLevel)} students, including ones open to international students. " +
+            $"Write the coverage, eligibility and deadline in {language}. Keep the scholarship name in its original form. " +
+            "List at most 6 distinct scholarships that appear on official or reputable pages you found.",
+            ["SCHOLARSHIP: <name> | <what it covers, e.g. full tuition, 50%, monthly stipend> | <who can apply, in one sentence> | <deadline as published, or unknown>",
+             "(one SCHOLARSHIP line per scholarship; if you found none write exactly: NONE)"],
+            "ScholarshipWebResearch", ct);
+
+        var items = new List<DiscoveredScholarship>();
+        foreach (var line in text.Split('\n'))
+        {
+            var t = line.Trim().TrimStart('*', '-', ' ');
+            if (!t.StartsWith("SCHOLARSHIP:", StringComparison.OrdinalIgnoreCase)) continue;
+            var parts = t["SCHOLARSHIP:".Length..].Split('|', StringSplitOptions.TrimEntries);
+            if (parts.Length < 2 || string.IsNullOrWhiteSpace(parts[0]) || parts[0].StartsWith('<')) continue;
+            string Part(int i) => i < parts.Length && !string.IsNullOrWhiteSpace(parts[i]) ? parts[i].Trim('*', ' ') : "";
+            items.Add(new DiscoveredScholarship(parts[0].Trim('*', ' '), Part(1), Part(2), Part(3)));
+            if (items.Count == 6) break;
+        }
+
+        return new ScholarshipDiscoveryOutput(items, sources);
+    }
+
     public async Task<ThresholdResearchOutput> ResearchThresholdsAsync(ThresholdResearchInput input, CancellationToken ct)
     {
         var (text, sources) = await GroundedTextAsync(
@@ -404,7 +431,7 @@ public sealed class GeminiReasoningService(
                 httpResponse?.Dispose();
                 httpResponse = await http.SendAsync(httpRequest, ct);
                 usedModel = m;
-                if (httpResponse.StatusCode != System.Net.HttpStatusCode.TooManyRequests) break;
+                if (httpResponse.StatusCode is not (System.Net.HttpStatusCode.TooManyRequests or System.Net.HttpStatusCode.NotFound)) break;
             }
             using var _ = httpResponse;
             httpResponse!.EnsureSuccessStatusCode();

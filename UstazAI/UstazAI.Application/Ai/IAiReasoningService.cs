@@ -61,6 +61,8 @@ public interface IAiReasoningService
     Task<ProgramResearchOutput> ResearchProgramAsync(ProgramResearchInput input, CancellationToken ct);
 
     Task<ThresholdResearchOutput> ResearchThresholdsAsync(ThresholdResearchInput input, CancellationToken ct);
+
+    Task<ScholarshipDiscoveryOutput> DiscoverScholarshipsAsync(ScholarshipDiscoveryInput input, CancellationToken ct);
 }
 
 public sealed record ProgramResearchInput(string ProgramName, string UniversityName, string Country, string DegreeLevel);
@@ -76,3 +78,9 @@ public sealed record ThresholdResearchInput(string ProgramName, string Universit
 public sealed record ThresholdResearchOutput(
     decimal? StateThreshold, decimal? UniversityThreshold, decimal? CutoffMin, decimal? CutoffMax,
     decimal? CutoffMedian, int? CutoffYearsCount, List<ProgramResearchSource> Sources);
+
+public sealed record ScholarshipDiscoveryInput(string UniversityName, string Country, string? DegreeLevel);
+
+public sealed record DiscoveredScholarship(string Name, string Coverage, string Eligibility, string Deadline);
+
+public sealed record ScholarshipDiscoveryOutput(List<DiscoveredScholarship> Scholarships, List<ProgramResearchSource> Sources);

@@ -460,7 +460,17 @@
     "title": "Scholarship matching",
     "search": "Search",
     "minCoverage": "Min. coverage %",
-    "country": "Country"
+    "country": "Country",
+    "discoverTitle": "Find scholarships online with AI",
+    "discoverHint": "AI searches the web for scholarships a university offers and shows only what it can cite. Always confirm on the official site.",
+    "university": "University",
+    "discover": "Search the web",
+    "discovering": "Searching the web…",
+    "discoverNone": "No scholarships were confirmed for this university.",
+    "discoverDisclaimer": "Found by AI on the web. Details can change — check the official page before applying.",
+    "discoverFailed": "Could not search online.",
+    "deadline": "Deadline",
+    "sources": "Sources"
   },
   "programs": {
     "title": "Browse programs",
